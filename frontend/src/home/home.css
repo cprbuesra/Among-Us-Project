@@ -1,3 +1,10 @@
+.vh-100 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
 body {
     background-image: url('./homebackground.jpg');
     background-size: cover;
@@ -6,14 +13,119 @@ body {
     overflow: hidden;
 }
 
-.logo {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 200px;
-    height: auto;
+.input-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
 }
+
+.form-control {
+    width: 170px;
+    height: 28px;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    font-family: monospace;
+    font-size: 15px;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.2);
+    margin-right: 30px;
+}
+
+.form-control:hover {
+    border-color: #D9D9D9;
+    box-shadow: 0 0 10px #D9D9D9;
+}
+
+.form-control:focus {
+    border-color: #D9D9D9;
+    box-shadow: 0 0 10px #D9D9D9;
+}
+
+
+.btn-danger {
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    color: red;
+    font-size: 25px;
+    font-family: monospace;
+    animation: glow 1s infinite alternate;
+    cursor: pointer;
+    background: none;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 10px red; /* Textschatten in Rot */
+    }
+    to {
+        text-shadow: 0 0 20px red, 0 0 30px red, 0 0 40px red, 0 0 50px red; /* Textschatten mit Leuchteffekt */
+    }
+}
+
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+}
+
+.content {
+    text-align: center;
+}
+
+.logo {
+    width: 700px;
+    height: auto;
+    margin-bottom: 40px;
+    cursor: default;
+
+}
+
+.menu a {
+    font-family: "Gill Sans", sans-serif;
+    color: white;
+    font-size: 30px;
+    transform: rotate(90deg);
+    margin-bottom: 180px;
+}
+
+.menu {
+    position: fixed;
+    right: 10px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+}
+
+.home-button {
+    position: fixed;
+    top: 20px;
+    left: 40px;
+    width: 50px;
+    height: 50px;
+    font-size: 40px;
+    color: black;
+    text-decoration: none;
+    background-color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.home-button:hover {
+    border-color: #D9D9D9;
+    box-shadow: 0 0 10px #D9D9D9;
+}
+
+
+
 
 
 
