@@ -22,4 +22,9 @@ public class UserController {
     public User saveUser(@RequestBody User user) {
         return userService.saveUser(user);
     }
+
+    @PostMapping("/move")
+    public User moveUser(@RequestBody MoveRequest moveRequest) {
+        return userService.moveUser(moveRequest.getUserId(), moveRequest.getDirection());
+    }
 }

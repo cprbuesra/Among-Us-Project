@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 import logo from './logo.png';
 import './home.css';
+import {useNavigate} from "react-router-dom";
 
 
     const Home = () => {
         // State to store the input value
         const [name, setName] = useState('');
+        const navigate = useNavigate();
 
         // Handler to update state with input value
         const handleInputChange = (e) => {
@@ -27,6 +29,7 @@ import './home.css';
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
+                    navigate("/game");
                     // Handle success (e.g., navigate to another page or show a success message)
                 } else {
                     // Handle errors (e.g., show an error message)

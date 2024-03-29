@@ -1,6 +1,11 @@
 import React from 'react';
 
 const PlayerCircle = ({ position }) => {
+
+    if (!position) {
+        return null; // or return a placeholder or loading indicator
+    }
+
     const style = {
         width: '40px',
         height: '40px',
