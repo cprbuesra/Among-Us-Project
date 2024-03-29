@@ -1,9 +1,43 @@
-import React from 'react';
-import { Container } from 'react-bootstrap';
+import React, {useState} from 'react';
 import logo from './logo.png';
 import './home.css';
 
-const Home = () => {
+
+    const Home = () => {
+        // State to store the input value
+        const [name, setName] = useState('');
+
+        // Handler to update state with input value
+        const handleInputChange = (e) => {
+            setName(e.target.value);
+        };
+
+        // Handler for submitting the data
+        const handleSubmit = async (e) => {
+            e.preventDefault(); // Prevents the default form submission behavior
+            try {
+                // Replace 'YOUR_API_ENDPOINT' with your actual endpoint URL
+                const response = await fetch('http://localhost:8080/user/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username: name }), // Sending the name in the body
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    // Handle success (e.g., navigate to another page or show a success message)
+                } else {
+                    // Handle errors (e.g., show an error message)
+                    console.error('Failed to send name to the API');
+                }
+            } catch (error) {
+                console.error('Error submitting name:', error);
+            }
+        };
+
+
     return (
         <div className="container">
             <a href="/" className="home-button">&#8962;</a>
@@ -15,16 +49,18 @@ const Home = () => {
                     <a href="/">how to</a>
                     <a href="/">about</a>
                 </div>
-                <div className="input-group">
+                <form className="input-group" onSubmit={handleSubmit}>
                     <input
                         type="text"
                         className="form-control"
                         placeholder="Enter Name"
                         maxLength={10}
                         required={true}
+                        value={name}
+                        onChange={handleInputChange}
                     />
-                    <button className="btn btn-danger">play</button>
-                </div>
+                    <button className="btn btn-danger" >play</button>
+                </form>
             </div>
         </div>
     );
