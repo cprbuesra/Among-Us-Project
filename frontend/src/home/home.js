@@ -11,9 +11,9 @@ const Home = () => {
             <div className="content">
                 <img src={logo} className="logo mb-4" alt="Logo"/>
                 <div className="menu">
-                    <a href="#profile">profile</a>
-                    <a href="#howto">how to</a>
-                    <a href="#about">about</a>
+                    <a href="/">profile</a>
+                    <a href="/">how to</a>
+                    <a href="/">about</a>
                 </div>
                 <div className="input-group">
                     <input
