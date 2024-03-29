@@ -1,19 +1,15 @@
-import React from 'react';
+import React from "react";
 
-const PlayerCircle = ({ position }) => {
-
-    if (!position) {
-        return null; // or return a placeholder or loading indicator
-    }
-
+const PlayerCircle = () => {
     const style = {
         width: '40px',
         height: '40px',
         borderRadius: '50%',
         backgroundColor: 'red',
         position: 'fixed',
-        left: position.x,
-        top: position.y,
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
     };
 
     return <div style={style}></div>;

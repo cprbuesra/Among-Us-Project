@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios"; // Make sure to import axios
+import axios from "axios";
 import PlayerCircle from "./PlayerCircle";
 
 const Game = () => {
-    const [position, setPosition] = useState({ x: 850, y: 260 }); // Initialize with a default position
+    const [position, setPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
 
     useEffect(() => {
         const handleKeyPress = async (event) => {
@@ -18,7 +18,7 @@ const Game = () => {
 
             try {
                 const response = await axios.post('http://localhost:8080/user/move', {
-                    userId: 1, // Update with dynamic user ID handling
+                    userId: 1,
                     direction: direction
                 });
                 setPosition({ x: response.data.x, y: response.data.y });
@@ -29,24 +29,22 @@ const Game = () => {
 
         window.addEventListener('keydown', handleKeyPress);
         return () => window.removeEventListener('keydown', handleKeyPress);
-    }, [position]); // Consider removing position from dependency array if it causes excessive API calls
+    }, []);
 
     const mapStyle = {
         position: 'absolute',
-        width: '200%', // Adjust based on your map's size
-        height: '200%', // Adjust based on your map's size
+        width: '500%',
+        height: '500%',
         left: `calc(50% - ${position.x}px)`,
         top: `calc(50% - ${position.y}px)`,
-        backgroundImage: 'url(/The_Skeld_map.webp)', // Your map image
-        backgroundSize: 'contain', // or 'cover', depending on your preference
+        backgroundImage: 'url(/The_Skeld_map.webp)',
+        backgroundSize: 'contain',
     };
 
     return (
-        <div style={{position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden'}}>
-            <div style={mapStyle}>
-                {/* The map moves, but the PlayerCircle stays at the center */}
-            </div>
-            <PlayerCircle position={position}/>
+        <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
+            <div style={mapStyle}></div>
+            <PlayerCircle />
         </div>
     );
 };

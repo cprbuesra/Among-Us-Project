@@ -27,7 +27,3 @@ public class UserService {
         return userRepository.save(user);
     }
 }
-
-// ToDO Spieler zentrieren
-// ToDO Zoom
-// ToDO Map mit Spieler mitgehen
