@@ -1,12 +1,57 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, {useEffect, useRef, useState} from "react";
+import * as SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 import PlayerCircle from "./PlayerCircle";
 
 const Game = () => {
     const [position, setPosition] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+    const stompClient = useRef(null);
+
+
+
+    useEffect(() => {
+        const socket = new SockJS('http://localhost:8080/ws');
+        stompClient.current = new Client({
+            webSocketFactory: () => socket,
+        });
+
+        stompClient.current.activate();
+
+        stompClient.current.onConnect = (frame) => {
+            console.log('Connected: ' + frame);
+
+            stompClient.current.subscribe('/topic/move', (message) => {
+                console.log('Message received: ', message);
+                const playerPosition = JSON.parse(message.body);
+                console.log('Player position:', playerPosition);
+                setPosition({ x: playerPosition.newPositionX, y: playerPosition.newPositionY });
+            });
+        };
+
+        stompClient.current.onStompError = (frame) => {
+            console.error('Broker reported error: ' + frame.headers['message']);
+            console.error('Additional details: ' + frame.body);
+        };
+
+        return () => {
+            stompClient.current.deactivate();
+        };
+    }, []);
+
+    const sendMovement = (direction, playerId) => {
+        if (stompClient.current && stompClient.current.active) {
+            stompClient.current.publish({
+                destination: "/app/move",
+                body: JSON.stringify({ playerId, direction }),
+            });
+        }
+    };
 
     useEffect(() => {
         const handleKeyPress = async (event) => {
+
+            const PlayerId = localStorage.getItem('playerId');
+
             let direction;
             switch (event.key) {
                 case "ArrowUp": direction = "UP"; break;
@@ -16,15 +61,7 @@ const Game = () => {
                 default: return;
             }
 
-            try {
-                const response = await axios.post('http://localhost:8080/user/move', {
-                    userId: 1,
-                    direction: direction
-                });
-                setPosition({ x: response.data.x, y: response.data.y });
-            } catch (error) {
-                console.error('Error moving player:', error);
-            }
+            sendMovement(direction, PlayerId);
         };
 
         window.addEventListener('keydown', handleKeyPress);

@@ -1,8 +1,6 @@
 package org.fhv.amongus.amongus.user;
 
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,20 +9,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
-public class UserController {
+@RequestMapping("/player")
+public class PlayerController {
 
-    private final UserService userService;
+    private final PlayerService _playerService;
 
 
 
     @PostMapping("/save")
-    public User saveUser(@RequestBody User user) {
-        return userService.saveUser(user);
+    public Player savePlayer(@RequestBody Player player) {
+        return _playerService.savePlayer(player);
     }
 
     @PostMapping("/move")
-    public User moveUser(@RequestBody MoveRequest moveRequest) {
-        return userService.moveUser(moveRequest.getUserId(), moveRequest.getDirection());
+    public Player movePlayer(@RequestBody MoveRequest moveRequest) {
+        return _playerService.movePlayer(moveRequest.getPlayerId(), moveRequest.getDirection());
     }
 }

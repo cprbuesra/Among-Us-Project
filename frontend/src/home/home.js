@@ -6,34 +6,29 @@ import {useNavigate} from "react-router-dom";
 
 
     const Home = () => {
-        // State to store the input value
         const [name, setName] = useState('');
         const navigate = useNavigate();
 
-        // Handler to update state with input value
         const handleInputChange = (e) => {
             setName(e.target.value);
         };
 
-        // Handler for submitting the data
         const handleSubmit = async (e) => {
-            e.preventDefault(); // Prevents the default form submission behavior
+            e.preventDefault();
             try {
-                // Replace 'YOUR_API_ENDPOINT' with your actual endpoint URL
-                const response = await fetch('http://localhost:8080/user/save', {
+                const response = await fetch('http://localhost:8080/player/save', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username: name }), // Sending the name in the body
+                    body: JSON.stringify({ username: name }),
                 });
                 if (response.ok) {
                     const data = await response.json();
                     console.log(data);
+                    localStorage.setItem('playerId', data.id);
                     navigate("/game");
-                    // Handle success (e.g., navigate to another page or show a success message)
                 } else {
-                    // Handle errors (e.g., show an error message)
                     console.error('Failed to send name to the API');
                 }
             } catch (error) {
