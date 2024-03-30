@@ -6,9 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class MoveRequest {
+@AllArgsConstructor
+public class PlayerPosition {
     private Long playerId;
-    private String direction;
+    private int newPositionX;
+    private int newPositionY;
 }

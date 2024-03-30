@@ -6,17 +6,19 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
+public class CorsConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                // You can customize this to allow specific origins and HTTP methods
-                registry.addMapping("/**").allowedMethods("*").allowedOrigins("*");
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:3000") // The origin of your frontend application
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Allowed methods
+                        .allowedHeaders("*") // Allowed headers
+                        .allowCredentials(true);
             }
         };
     }
 }
-
