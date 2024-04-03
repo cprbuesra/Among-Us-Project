@@ -4,6 +4,7 @@ import icon from './homeicon.png';
 import './home.css';
 import backgroundImage from './homebackground2.jpg'
 import {useNavigate} from "react-router-dom";
+import LoadingScreen from "../LoadingScreen/loadingScreen";
 
 
     const Home = () => {
@@ -28,7 +29,7 @@ import {useNavigate} from "react-router-dom";
                     const data = await response.json();
                     console.log(data);
                     localStorage.setItem('playerId', data.id);
-                    navigate("/game");
+                    navigate("/loadingScreen");
                 } else {
                     console.error('Failed to send name to the API');
                 }
@@ -38,8 +39,8 @@ import {useNavigate} from "react-router-dom";
         };
 
 
-
-    return (
+        let loading;
+        return (
         <div className="container" style={{
             backgroundImage: `url(${backgroundImage})`,
             backgroundSize: 'cover',
@@ -71,7 +72,9 @@ import {useNavigate} from "react-router-dom";
                     <button className="btn btn-danger">play</button>
                 </form>
             </div>
+            {loading && <LoadingScreen />}
         </div>
+
     );
     };
 

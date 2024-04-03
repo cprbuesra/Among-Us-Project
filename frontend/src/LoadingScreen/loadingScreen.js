@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import './LoadingScreen.css';
 
 
-function AmongUsLoadingScreen() {
+function LoadingScreen() {
     const [position, setPosition] = useState(0);
-    const history = useHistory();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -15,11 +15,11 @@ function AmongUsLoadingScreen() {
         // Simulation einer längeren Ladezeit
         setTimeout(() => {
             clearInterval(interval);
-            history.push('/game'); // Weiterleitung zur Spieloberfläche nach dem Laden
+            navigate('/game'); // Weiterleitung zur Spieloberfläche nach dem Laden
         }, 3000); // Hier kannst du die Dauer des Ladebildschirms einstellen (z.B. 3000ms = 3 Sekunden)
 
         return () => clearInterval(interval);
-    }, [history]);
+    }, []);
 
     return (
         <div className="among-us-loading-screen">
@@ -30,4 +30,4 @@ function AmongUsLoadingScreen() {
     );
 }
 
-export default AmongUsLoadingScreen;
+export default LoadingScreen;
