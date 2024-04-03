@@ -85,7 +85,7 @@ body {
 }
 
 .menu a {
-    font-family: "Gill Sans", sans-serif;
+    font-family: Gill Sans, sans-serif;
     color: white;
     font-size: 30px;
     transform: rotate(90deg);
