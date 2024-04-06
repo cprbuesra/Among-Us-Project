@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MoveRequest {
-    private Long playerId;
+    private Long id;
     private String direction;
 }
