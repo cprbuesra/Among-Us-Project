@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import logo from './logo.png';
+import icon from './homeicon.png';
 import './home.css';
+import backgroundImage from './homebackground2.jpg'
 import {useNavigate} from "react-router-dom";
 
 const Home = () => {
@@ -41,8 +43,16 @@ const Home = () => {
     };
 
     return (
-        <div className="container">
-            <a href="/" className="home-button">&#8962;</a>
+        <div className="container" style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '100vh',
+            overflow: 'hidden'
+        }}>
+            <a href="/" className="home-button">
+                <img src={icon} alt="Home" style={{width: '43px', height: '40px'}}/>
+            </a>
 
             <div className="content">
                 <img src={logo} className="logo mb-4" alt="Logo"/>
@@ -61,7 +71,7 @@ const Home = () => {
                         value={name}
                         onChange={handleInputChange}
                     />
-                    <button className="btn btn-danger" >play</button>
+                    <button className="btn btn-danger">play</button>
                 </form>
                 {error && (
                     <div className="error-message">
@@ -73,6 +83,6 @@ const Home = () => {
             </div>
         </div>
     );
-};
+    };
 
 export default Home;

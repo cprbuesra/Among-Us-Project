@@ -5,14 +5,6 @@
     align-items: center;
 }
 
-body {
-    background-image: url('./homebackground.jpg');
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-    overflow: hidden;
-}
-
 .input-group {
     display: flex;
     align-items: center;
@@ -85,7 +77,7 @@ body {
 }
 
 .menu a {
-    font-family: "Gill Sans", sans-serif;
+    font-family: Gill Sans, sans-serif;
     color: white;
     font-size: 30px;
     transform: rotate(90deg);
