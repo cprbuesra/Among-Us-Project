@@ -18,5 +18,4 @@ public class Player {
     private String username;
     private int x;
     private int y;
-
 }

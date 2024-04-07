@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlayerMove {
-    private Long playerId;
+    private Long id;
     private String direction;
 }
 
