@@ -1,14 +1,14 @@
 import React from "react";
 
-const PlayerCircle = () => {
+const PlayerCircle = ({position}) => {
     const style = {
+        position: 'absolute',
+        left: `${position.x}px`,
+        top: `${position.y}px`,
         width: '40px',
         height: '40px',
         borderRadius: '50%',
         backgroundColor: 'red',
-        position: 'fixed',
-        left: '50%',
-        top: '50%',
         transform: 'translate(-50%, -50%)',
     };
 

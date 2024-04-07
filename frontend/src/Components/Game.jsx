@@ -5,16 +5,15 @@ import PlayerCircle from "./PlayerCircle";
 
 const Game = () => {
     const [position, setPosition] = useState({ x: 1400, y: 1400 });
+    const [players, setPlayers] = useState([]);
     const stompClient = useRef(null);
+    const [jwtToken] = useState(localStorage.getItem('jwtToken'));
+    const [sessionId] = useState(localStorage.getItem('sessionId'));
 
 
     useEffect(() => {
 
-        const playerId = localStorage.getItem('playerId');
-        if (!playerId) {
-            console.error('Player ID is missing. Cannot establish WebSocket connection.');
-            return;
-        }
+
 
         const socket = new SockJS('http://localhost:8080/ws');
         stompClient.current = new Client({
@@ -30,7 +29,21 @@ const Game = () => {
                 console.log('Message received: ', message);
                 const playerPosition = JSON.parse(message.body);
                 console.log('Player position:', playerPosition);
-                setPosition({ x: playerPosition.newPositionX, y: playerPosition.newPositionY });
+
+                // Update players state
+                setPlayers(prevPlayers => {
+                    const existingPlayer = prevPlayers.find(player => player.sessionId === playerPosition.sessionId);
+                    if (existingPlayer) {
+                        // Update existing player position
+                        return prevPlayers.map(player => player.sessionId === playerPosition.sessionId ? playerPosition : player);
+                    } else {
+                        // Add new player
+                        return [...prevPlayers, playerPosition];
+                    }
+                });
+                if (playerPosition.sessionId === sessionId) {
+                    setPosition({ x: playerPosition.newPositionX, y: playerPosition.newPositionY })
+                }
             });
         };
 
@@ -42,21 +55,24 @@ const Game = () => {
         return () => {
             stompClient.current.deactivate();
         };
-    }, []);
+    }, [sessionId]);
 
-    const sendMovement = (direction, playerId) => {
+
+    const sendMovement = (direction) => {
         if (stompClient.current && stompClient.current.active) {
             stompClient.current.publish({
                 destination: "/app/move",
-                body: JSON.stringify({ id: playerId, direction: direction }),
+                body: JSON.stringify({
+                    direction: direction,
+                    token: jwtToken,
+                    sessionId: sessionId
+                }),
             });
         }
     };
 
     useEffect(() => {
         const handleKeyPress = async (event) => {
-
-            const PlayerId = localStorage.getItem('playerId');
 
             let direction;
             switch (event.key) {
@@ -67,12 +83,12 @@ const Game = () => {
                 default: return;
             }
 
-            sendMovement(direction, PlayerId);
+            sendMovement(direction);
         };
 
         window.addEventListener('keydown', handleKeyPress);
         return () => window.removeEventListener('keydown', handleKeyPress);
-    }, []);
+    });
 
     const mapStyle = {
         position: 'absolute',
@@ -87,7 +103,7 @@ const Game = () => {
     return (
         <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden' }}>
             <div style={mapStyle}></div>
-            <PlayerCircle position={position}/>
+            {players.map(player => <PlayerCircle key={player.sessionId} position={{ x: player.newPositionX, y: player.newPositionY }} />)}
         </div>
     );
 };

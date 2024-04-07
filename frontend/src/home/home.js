@@ -4,10 +4,10 @@ import icon from './homeicon.png';
 import './home.css';
 import backgroundImage from './homebackground2.jpg'
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 const Home = () => {
     const [name, setName] = useState('');
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     const handleInputChange = (e) => {
@@ -16,31 +16,24 @@ const Home = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
-            const response = await fetch('http://localhost:8080/player/save', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username: name }),
-            });
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data);
-                localStorage.setItem('playerId', data.id);
-                navigate("/game");
-            } else if (response.status === 404) {
-                setError('Player with this username already exists. \nPlease enter another username.');
-            } else {
-                const errorData = await response.text();
-                setError(errorData);
-                console.error('Failed to send name to the API');
-            }
+            const response = await axios.post('http://localhost:8080/player/save', {
+                username: name}
+            )
+            console.log('Joined successfully: ', response.data);
+            alert('Joined successfully')
+            localStorage.setItem('jwtToken', response.data.token);
+            localStorage.setItem('sessionId', response.data.sessionId);
+
+            navigate("/game");
         } catch (error) {
-            setError('Error submitting name');
-            console.error('Error submitting name:', error);
+            if (error.response && error.response.data) {
+                console.log('Error submitting name:', error.response.data);
+                alert('This username is already taken. Please choose another one.');
+            }
         }
-    };
+    }
 
     return (
         <div className="container" style={{
@@ -73,13 +66,6 @@ const Home = () => {
                     />
                     <button className="btn btn-danger">play</button>
                 </form>
-                {error && (
-                    <div className="error-message">
-                        {error.split('\n').map((line, index) => (
-                            <span key={index}>{line}<br/></span>
-                        ))}
-                    </div>
-                )}
             </div>
         </div>
     );
