@@ -7,10 +7,7 @@ import org.fhv.amongus.amongus.user.Player;
 import org.fhv.amongus.amongus.user.PlayerService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
-
-import java.util.Objects;
 
 @Controller
 @RequiredArgsConstructor
