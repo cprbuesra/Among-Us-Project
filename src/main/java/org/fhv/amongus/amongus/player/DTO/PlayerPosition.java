@@ -1,4 +1,4 @@
-package org.fhv.amongus.amongus.user;
+package org.fhv.amongus.amongus.player.DTO;
 
 
 import lombok.AllArgsConstructor;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlayerPosition {
-    private Long id;
+    private String token;
+    private String sessionId;
     private int newPositionX;
     private int newPositionY;
 }

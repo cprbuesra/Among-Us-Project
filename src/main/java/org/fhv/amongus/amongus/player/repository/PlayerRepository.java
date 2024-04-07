@@ -1,5 +1,6 @@
-package org.fhv.amongus.amongus.user;
+package org.fhv.amongus.amongus.player.repository;
 
+import org.fhv.amongus.amongus.player.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
