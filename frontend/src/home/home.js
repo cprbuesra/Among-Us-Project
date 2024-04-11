@@ -24,21 +24,33 @@ const Home = () => {
 
         try {
             const response = await axios.post('http://localhost:8080/player/save', {
-                username: name}
-            )
+                username: name
+            });
+
             console.log('Joined successfully: ', response.data);
-            alert('Joined successfully')
             localStorage.setItem('jwtToken', response.data.token);
             localStorage.setItem('sessionId', response.data.sessionId);
 
-            navigate("/game");
+            if (response.data.playersCount >= 10) {
+                alert('The lobby is already full.');
+            } else {
+                navigate("/lobby", { state: { inputName: name }});
+            }
         } catch (error) {
-            if (error.response && error.response.data) {
-                console.log('Error submitting name:', error.response.data);
+        if (error.response && error.response.data) {
+            console.log('Error submitting name:', error.response.data);
+            if (error.response.status === 409) { // 409 steht normalerweise für Konflikt (Username bereits vorhanden)
                 alert('This username is already taken. Please choose another one.');
             }
+        } else {
+            console.error('Error submitting name:', error);
+            alert('This username is already taken. Please choose another one.');
         }
     }
+
+}
+
+
 
     return (
         <div className="container" style={{
