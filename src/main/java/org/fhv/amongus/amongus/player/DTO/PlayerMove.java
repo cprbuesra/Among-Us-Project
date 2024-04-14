@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PlayerMove {
     private String direction;
+    private boolean flip;
     private String token;
     private String sessionId;
 }

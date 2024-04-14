@@ -25,7 +25,6 @@ const Home = () => {
             alert('Joined successfully')
             localStorage.setItem('jwtToken', response.data.token);
             localStorage.setItem('sessionId', response.data.sessionId);
-
             navigate("/game");
         } catch (error) {
             if (error.response && error.response.data) {

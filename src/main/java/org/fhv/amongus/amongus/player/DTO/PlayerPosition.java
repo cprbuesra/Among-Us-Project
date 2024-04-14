@@ -13,4 +13,5 @@ public class PlayerPosition {
     private String sessionId;
     private int newPositionX;
     private int newPositionY;
+    private boolean flipX;
 }

@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 public class MoveRequest {
     private String username;
     private String direction;
+    private boolean flip;
 }

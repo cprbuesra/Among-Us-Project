@@ -25,6 +25,7 @@ public class Player implements UserDetails {
     private String username;
     private int x;
     private int y;
+    private boolean flip;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
