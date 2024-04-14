@@ -1,0 +1,88 @@
+#lobby-body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: black;
+    font-family: 'Arial', sans-serif;
+}
+
+#lobby-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    font-family: monospace;
+    height: 100vh;
+}
+
+
+#player-list {
+    margin-bottom: 20px;
+}
+
+.player-name {
+    display: block;
+    margin: 5px 0;
+}
+
+#player-load span {
+    font-size: 20px;
+    color: white;
+}
+
+#player-load span::before {
+    content: "Waiting for Players.";
+    animation: increaseDots 2.6s infinite;
+}
+
+@keyframes increaseDots {
+    0% { content: "Waiting for Players."; }
+    33% { content: "Waiting for Players.."; }
+    66% { content: "Waiting for Players..."; }
+}
+
+
+#player-count span {
+    font-size: 1.5em;
+    color: red;
+}
+
+#start-button {
+    margin-top: 20px;
+    padding: 5px 40px;
+    font-size: 1em;
+    font-family: monospace;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    background-color: lightgray;
+}
+
+#start-button:hover{
+    background-color: whitesmoke;
+    box-shadow: 0 0 10px slategray;
+}
+
+#start-button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.crew {
+    margin-top: 60px;
+    margin-bottom: 20px;
+    max-width: 50%;
+}
+
+#game-info {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 50px;
+}

@@ -11,7 +11,6 @@ import {
     PLAYER_START_Y,
     PLAYER_HEIGHT,
     PLAYER_WIDTH,
-    SHIP_WIDTH, SHIP_HEIGHT
 } from "../../phaser/constants"; // Adjust the path as needed
 
 const Game = () => {

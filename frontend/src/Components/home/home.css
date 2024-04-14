@@ -64,6 +64,17 @@
     height: 90vh;
 }
 
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ändern Sie die Höhe auf 100vh */
+    background-image: url('./homebackground2.jpg'); /* Hintergrundbild */
+    background-size: cover; /* Bildgröße anpassen */
+    background-position: center; /* Bildposition zentrieren */
+}
+
+
 .content {
     text-align: center;
 }
