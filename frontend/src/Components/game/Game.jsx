@@ -15,8 +15,6 @@ import {
 } from "../../phaser/constants"; // Adjust the path as needed
 
 
-
-
 const Game = () => {
     const stompClientRef = useRef(null)
 
@@ -76,39 +74,44 @@ const Game = () => {
             function showTaskPopup(scene, task) {
                 const cam = scene.cameras.main;
 
-                // Hintergrund-Overlay erstellen
+                // Background overlay
                 const bg = scene.add.graphics({ fillStyle: { color: 0x000000, alpha: 0.5 } });
                 bg.fillRect(0, 0, cam.width, cam.height);
                 bg.setScrollFactor(0);
 
-                // Popup-Fenster erstellen
-                const popup = scene.add.rectangle(cam.centerX, cam.centerY, 200, 100, 0xffffff);
+                // Popup window
+                const popup = scene.add.rectangle(cam.centerX, cam.centerY, 200, 150, 0xffffff);
                 popup.setScrollFactor(0);
 
-                const text = scene.add.text(cam.centerX, cam.centerY, 'Finished', { fontSize: '32px', color: '#000' }).setOrigin(0.5);
-                text.setScrollFactor(0); // Fixiere den Text an der Kamera
+                // Task instructions or status text
+                const text = scene.add.text(cam.centerX, cam.centerY - 20, 'Task Status', { fontSize: '16px', color: '#000' }).setOrigin(0.5);
+                text.setScrollFactor(0);
 
-                // Schließbutton hinzufügen (hier nur als Beispieltext)
-                const closeButton = scene.add.text(cam.centerX + 70, cam.centerY - 40, 'X', { fontSize: '32px', color: '#ff0000' }).setInteractive();
-                closeButton.setScrollFactor(0); // Fixiere den Schließbutton an der Kamera
+                // Finish button
+                const finishButton = scene.add.text(cam.centerX - 80, cam.centerY + 20, 'Finish', { fontSize: '18px', color: '#00ff00' }).setInteractive();
+                finishButton.setScrollFactor(0);
+                finishButton.on('pointerdown', () => {
+                    bg.destroy();
+                    popup.destroy();
+                    text.destroy();
+                    closeButton.destroy();
+                    finishButton.destroy();
+                    task.destroy();  // Removes the task from the map
+                });
 
-
+                // Close button
+                const closeButton = scene.add.text(cam.centerX + 40, cam.centerY + 20, 'Close', { fontSize: '18px', color: '#ff0000' }).setInteractive();
+                closeButton.setScrollFactor(0);
                 closeButton.on('pointerdown', () => {
                     bg.destroy();
                     popup.destroy();
                     text.destroy();
                     closeButton.destroy();
+                    finishButton.destroy();
+                    // Task remains on the map
                 });
-                scene.input.enabled = true;
-
-
-                // Z-Ordering anpassen, falls nötig
-
-                bg.setDepth(3);
-                popup.setDepth(5);
-                text.setDepth(5);
-                closeButton.setDepth(3);
             }
+
 
 
             // Tastatureingaben abfangen
