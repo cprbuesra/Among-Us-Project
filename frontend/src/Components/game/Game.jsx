@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import React, {useEffect, useRef} from "react";
 import shipImg from "../../phaser/assets/ship.png"; // Adjust the path as needed
 import playerSprite from "../../phaser/assets/player.png"; // Adjust the path as needed
+import taskImg from '../../phaser/assets/task.png'; // Direkter Import des Bildes
 import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
 import {
@@ -10,11 +11,15 @@ import {
     PLAYER_START_X,
     PLAYER_START_Y,
     PLAYER_HEIGHT,
-    PLAYER_WIDTH,
+    PLAYER_WIDTH, TASK_POSITIONS,
 } from "../../phaser/constants"; // Adjust the path as needed
+
+
+
 
 const Game = () => {
     const stompClientRef = useRef(null)
+
     const jwtToken = localStorage.getItem('jwtToken');
     const sessionId = localStorage.getItem('sessionId');
     const player = {};
@@ -38,6 +43,7 @@ const Game = () => {
 
         function preload() {
             this.load.image('ship', shipImg);
+
             this.load.spritesheet('player', playerSprite, {
                 frameWidth: PLAYER_SPRITE_WIDTH,
                 frameHeight: PLAYER_SPRITE_HEIGHT
@@ -47,6 +53,8 @@ const Game = () => {
                 frameWidth: PLAYER_SPRITE_WIDTH,
                 frameHeight: PLAYER_SPRITE_HEIGHT,
             });
+
+            this.load.image('task', taskImg);
         }
 
         function create() {
@@ -54,6 +62,59 @@ const Game = () => {
             player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             player.sprite.displayHeight = PLAYER_HEIGHT;
             player.sprite.displayWidth = PLAYER_WIDTH;
+
+            TASK_POSITIONS.forEach((pos) => {
+                const task = this.add.image(pos.x, pos.y, 'task');
+                task.setScale(0.03);
+                task.setInteractive();
+                task.on('pointerdown', () => {
+                    showTaskPopup(this, task);
+
+                });
+            });
+
+            function showTaskPopup(scene, task) {
+                const cam = scene.cameras.main;
+
+                // Hintergrund-Overlay erstellen
+                const bg = scene.add.graphics({ fillStyle: { color: 0x000000, alpha: 0.5 } });
+                bg.fillRect(0, 0, cam.width, cam.height);
+                bg.setScrollFactor(0);
+
+                // Popup-Fenster erstellen
+                const popup = scene.add.rectangle(cam.centerX, cam.centerY, 200, 100, 0xffffff);
+                popup.setScrollFactor(0);
+
+                const text = scene.add.text(cam.centerX, cam.centerY, 'Finished', { fontSize: '32px', color: '#000' }).setOrigin(0.5);
+                text.setScrollFactor(0); // Fixiere den Text an der Kamera
+
+                // Schließbutton hinzufügen (hier nur als Beispieltext)
+                const closeButton = scene.add.text(cam.centerX + 70, cam.centerY - 40, 'X', { fontSize: '32px', color: '#ff0000' }).setInteractive();
+                closeButton.setScrollFactor(0); // Fixiere den Schließbutton an der Kamera
+
+
+                closeButton.on('pointerdown', () => {
+                    bg.destroy();
+                    popup.destroy();
+                    text.destroy();
+                    closeButton.destroy();
+                });
+                scene.input.enabled = true;
+
+
+                // Z-Ordering anpassen, falls nötig
+
+                bg.setDepth(3);
+                popup.setDepth(5);
+                text.setDepth(5);
+                closeButton.setDepth(3);
+            }
+
+
+            // Tastatureingaben abfangen
+            this.input.keyboard.on('keydown', (event) => {
+                // Tastatureingaben bearbeiten
+            });
 
             this.anims.create({
                 key: 'running',

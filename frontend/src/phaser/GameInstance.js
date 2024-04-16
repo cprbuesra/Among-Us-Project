@@ -1,92 +1,133 @@
 import Phaser from "phaser";
+import React, { useEffect, useRef } from "react";
+import shipImg from "../../phaser/assets/ship.png";  // Adjust the path as needed
+import playerSprite from "../../phaser/assets/player.png";  // Adjust the path as needed
 import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
-import shipImg from './assets/ship.png';
-import playerSprite from './assets/player.png';
-import {PLAYER_SPRITE_HEIGHT, PLAYER_SPRITE_WIDTH, PLAYER_START_X, PLAYER_START_Y} from "./constants";
 
+import {
+    PLAYER_SPRITE_HEIGHT,
+    PLAYER_SPRITE_WIDTH,
+    PLAYER_START_X,
+    PLAYER_START_Y,
+    PLAYER_HEIGHT,
+    PLAYER_WIDTH,
+} from "../../phaser/constants";  // Adjust the path as needed
 
-export class GameInstance extends Phaser.Scene {
-    constructor() {
-        super({key: 'GameInstance'});
-        console.log("GameInstance scene initialized");
-        this.player = null;
-        this.cursors = null;
-        this.stompClient = null;
-        }
+const Game = () => {
+    const stompClientRef = useRef(null);
+    const jwtToken = localStorage.getItem('jwtToken');
+    const sessionId = localStorage.getItem('sessionId');
+    const player = {};
+    const pressedKeys = useRef([]);
 
+    useEffect(() => {
+        const config = {
+            type: Phaser.AUTO,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            parent: 'game-container',
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
 
+        const game = new Phaser.Game(config);
 
-    preload() {
-        console.log("Preloading assets...");
-        this.load.image('ship', shipImg);
-        this.load.spritesheet('player', playerSprite, {
-            frameWidth: PLAYER_SPRITE_WIDTH,
-            frameHeight: PLAYER_SPRITE_HEIGHT
-        });
-    }
-
-    create() {
-        console.log("Creating scene...");
-        this.ship = this.add.image(0, 0, 'ship');
-        this.player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.connectWebSocket();
-    }
-
-    update() {
-        this.scene.scene.cameras.main.centerOn(this.player.sprite.x, this.player.sprite.y);
-
-        if (this.cursors.left.isDown) {
-            this.sendMove('LEFT');
-        } else if (this.cursors.right.isDown) {
-            this.sendMove('RIGHT');
-        }
-
-        if (this.cursors.up.isDown) {
-            this.sendMove('UP');
-        } else if (this.cursors.down.isDown) {
-            this.sendMove('DOWN');
-        }
-
-    }
-
-    connectWebSocket() {
-        const socket = new SockJS('http://localhost:8080/ws'); // Adjust URL to match your server
-        this.stompClient = Stomp.over(socket);
-        this.stompClient.connect({}, () => {
-            this.stompClient.subscribe('/topic/move', (message) => {
-                // Handle incoming message
-                const playerPosition = JSON.parse(message.body);
-                this.updateGameState(playerPosition);
+        function preload() {
+            this.load.image('ship', shipImg);
+            this.load.spritesheet('player', playerSprite, {
+                frameWidth: PLAYER_SPRITE_WIDTH,
+                frameHeight: PLAYER_SPRITE_HEIGHT
             });
-        }, (error) => {
-            console.error('WebSocket connection error:', error);
-        });
-    }
-
-    sendMove(direction) {
-
-        const jwtToken = localStorage.getItem('jwtToken');
-        const sessionId = localStorage.getItem('sessionId');
-        if (this.stompClient && this.stompClient.connected) {
-            this.stompClient.send('/app/move', JSON.stringify({
-                direction: direction,
-                token: jwtToken,
-                sessionId: sessionId
-            }), {});
+            this.load.image('task', 'path/to/task.png');  // Load the task icon
         }
-    }
 
-    updateGameState(gameState) {
-        // Update your game state based on server messages
-        // For example, moving player sprites, updating scores, etc.
-        console.log('Game state updated:', gameState);
-    }
+        function create() {
+            this.ship = this.add.image(0, 0, 'ship').setOrigin(0, 0);
+            player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
+            player.sprite.displayHeight = PLAYER_HEIGHT;
+            player.sprite.displayWidth = PLAYER_WIDTH;
 
+            // Adding a task sprite
+            const taskSprite = this.add.sprite(300, 300, 'task').setInteractive(); // Adjust x, y as needed
+            taskSprite.on('pointerdown', () => onTaskClicked('task1'));
 
-}
+            this.input.keyboard.on('keydown', (event) => {
+                if (!pressedKeys.current.includes(event.code)) {
+                    pressedKeys.current.push(event.code);
+                }
+            });
 
+            this.input.keyboard.on('keyup', (event) => {
+                pressedKeys.current = pressedKeys.current.filter((key) => key !== event.code);
+            });
 
-export default GameInstance;
+            this.cursors = this.input.keyboard.createCursorKeys();
+            connectWebSocket();
+        }
 
+        function update() {
+            this.scene.scene.cameras.main.centerOn(player.sprite.x, player.sprite.y);
+            movePlayer();
+        }
+
+        function connectWebSocket() {
+            const socket = new SockJS('http://localhost:8080/ws');
+            stompClientRef.current = Stomp.over(socket);
+            stompClientRef.current.connect({}, () => {
+                stompClientRef.current.subscribe('/topic/move', (message) => {
+                    const playerPosition = JSON.parse(message.body);
+                    updateGameState(playerPosition);
+                });
+            }, (error) => {
+                console.error('WebSocket connection error:', error);
+            });
+        }
+
+        function movePlayer() {
+            if (pressedKeys.current.includes('ArrowUp')) {
+                player.sprite.y -= 10;
+            } else if (pressedKeys.current.includes('ArrowDown')) {
+                player.sprite.y += 10;
+            }
+
+            if (pressedKeys.current.includes('ArrowLeft')) {
+                player.sprite.x -= 10;
+            } else if (pressedKeys.current.includes('ArrowRight')) {
+                player.sprite.x += 10;
+            }
+        }
+
+        function updateGameState(playerPosition) {
+            player.sprite.x = playerPosition.newPositionX;
+            player.sprite.y = playerPosition.newPositionY;
+        }
+
+        function onTaskClicked(taskKey) {
+            console.log(`Task ${taskKey} clicked`);
+            alert(`You clicked on task at ${taskKey}`);  // Simple alert for demonstration
+        }
+
+        return () => {
+            game.destroy(true);
+        };
+    }, []);
+
+    return (
+        <div id="game-container">
+            <canvas />
+        </div>
+    );
+};
+
+export default Game;
