@@ -23,8 +23,8 @@ const Home = () => {
             )
             console.log('Joined successfully: ', response.data);
             alert('Joined successfully')
-            localStorage.setItem('jwtToken', response.data.token);
-            localStorage.setItem('sessionId', response.data.sessionId);
+            sessionStorage.setItem('jwtToken', response.data.token);
+            sessionStorage.setItem('sessionId', response.data.sessionId);
             navigate("/game");
         } catch (error) {
             if (error.response && error.response.data) {

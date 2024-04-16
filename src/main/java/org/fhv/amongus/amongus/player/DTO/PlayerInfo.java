@@ -6,11 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class PlayerPosition {
+@NoArgsConstructor
+public class PlayerInfo {
+
+    private String token;
     private String sessionId;
-    private int newPositionX;
-    private int newPositionY;
-    private boolean flipX;
 }

@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import React, {useEffect, useRef} from "react";
-import shipImg from "../../phaser/assets/ship.png"; // Adjust the path as needed
-import playerSprite from "../../phaser/assets/player.png"; // Adjust the path as needed
+import shipImg from "./assets/ship.png";
+import playerSprite from "./assets/player.png";
 import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
 import {
@@ -11,13 +11,14 @@ import {
     PLAYER_START_Y,
     PLAYER_HEIGHT,
     PLAYER_WIDTH,
-} from "../../phaser/constants"; // Adjust the path as needed
+} from "./constants";
 
 const Game = () => {
     const stompClientRef = useRef(null)
-    const jwtToken = localStorage.getItem('jwtToken');
-    const sessionId = localStorage.getItem('sessionId');
+    const jwtToken = sessionStorage.getItem('jwtToken');
+    const sessionId = sessionStorage.getItem('sessionId');
     const player = {};
+    const players = useRef(new Map());
     const pressedKeys = useRef([]);
 
     useEffect(() => {
@@ -37,6 +38,8 @@ const Game = () => {
         const game = new Phaser.Game(config);
 
         function preload() {
+            const socket = new SockJS('http://localhost:8080/ws');
+            stompClientRef.current = Stomp.over(socket);
             this.load.image('ship', shipImg);
             this.load.spritesheet('player', playerSprite, {
                 frameWidth: PLAYER_SPRITE_WIDTH,
@@ -47,6 +50,8 @@ const Game = () => {
                 frameWidth: PLAYER_SPRITE_WIDTH,
                 frameHeight: PLAYER_SPRITE_HEIGHT,
             });
+
+
         }
 
         function create() {
@@ -54,6 +59,8 @@ const Game = () => {
             player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             player.sprite.displayHeight = PLAYER_HEIGHT;
             player.sprite.displayWidth = PLAYER_WIDTH;
+
+            players.current.set(sessionId, player.sprite);
 
             this.anims.create({
                 key: 'running',
@@ -72,47 +79,92 @@ const Game = () => {
             });
 
 
-            this.cursors = this.input.keyboard.createCursorKeys();
-            connectWebSocket(player);
+            stompClientRef.current.connect({}, () => {
+                stompClientRef.current.subscribe('/topic/move', (message) => {
+                    const playerPosition = JSON.parse(message.body);
+                    console.log('This is the player position from the server: ' + playerPosition);
+                    console.log('This is the session ID from the server: ' + playerPosition.sessionId);
+                    console.log('This is the session ID from the client: ' + sessionId);
+                    console.log('Position of local player: ' + player.sprite.x + ' ' + player.sprite.y);
+
+                    if (players.current.has(playerPosition.sessionId)) {
+                        let playerSprite = players.current.get(playerPosition.sessionId);
+                        if (playerPosition.newPositionX < playerSprite.x) { // Moving left
+                            playerSprite.setFlipX(true);
+                        } else if (playerPosition.newPositionX > playerSprite.x) { // Moving right
+                            playerSprite.setFlipX(false);
+                        }
+
+                        playerSprite.x = playerPosition.newPositionX;
+                        playerSprite.y = playerPosition.newPositionY;
+                        playerSprite.moving = true;
+                    } else if (playerPosition.sessionId !== sessionId) {
+                        createPlayerSprite(this, playerPosition.sessionId, playerPosition.newPositionX, playerPosition.newPositionY);
+                        let newPlayerSprite = players.current.get(playerPosition.sessionId);
+                        newPlayerSprite.setFlipX(playerPosition.flip);
+                    }
+                });
+                stompClientRef.current.subscribe('/topic/moveEnd', (message) => {
+                    const endMove = JSON.parse(message.body);
+                    const playerSprite = players.current.get(endMove.sessionId);
+                    if (playerSprite) {
+                        playerSprite.moving = false;
+                    }
+                });
+            });
         }
 
         function update() {
             this.scene.scene.cameras.main.centerOn(player.sprite.x, player.sprite.y);
-            movePlayer(pressedKeys.current, player.sprite)
+            const playerMoved = movePlayer(pressedKeys.current, player.sprite)
+            if (playerMoved) {
+                player.movedLastFrame = true;
+            } else {
+                if (player.movedLastFrame) {
+                    if (stompClientRef.current && stompClientRef.current.connected) {
+                        stompClientRef.current.send('/app/moveEnd', JSON.stringify({
+                            token: jwtToken,
+                            sessionId: sessionId
+                        }), {});
+                    }
+                    player.movedLastFrame = false;
+                }
+            }
             animateMovement(pressedKeys.current, player.sprite)
-        }
-
-        function connectWebSocket(player) {
-            const socket = new SockJS('http://localhost:8080/ws');
-            stompClientRef.current = Stomp.over(socket);
-            stompClientRef.current.connect({}, () => {
-                stompClientRef.current.subscribe('/topic/move', (message) => {
-                    const playerPosition = JSON.parse(message.body);
-                    updateGameState(player, playerPosition);
-                });
-            }, (error) => {
-                console.error('WebSocket connection error:', error);
+            // Animate other players
+            players.current.forEach((playerSprite, sessionId) => {
+                if (sessionId !== sessionStorage.getItem('sessionId')) { // Don't update the local player in this loop
+                    if (playerSprite.moving && !playerSprite.anims.isPlaying) {
+                        playerSprite.play('running');
+                    } else if (!playerSprite.moving && playerSprite.anims.isPlaying) {
+                        playerSprite.stop('running');
+                    }
+                }
             });
         }
 
         function movePlayer(pressedKeys, sprite) {
+            let playerMoved = false
 
             if (pressedKeys.includes('ArrowUp')) {
                 sendMove('UP', sprite.flipX);
+                playerMoved = true;
             } else if (pressedKeys.includes('ArrowDown')) {
                 sendMove('DOWN', sprite.flipX);
+                playerMoved = true;
             } else if (pressedKeys.includes('ArrowLeft')) {
                 sprite.setFlipX(true);
                 sendMove('LEFT', true);
+                playerMoved = true;
             } else if (pressedKeys.includes('ArrowRight')) {
                 sprite.setFlipX(false);
                 sendMove('RIGHT', false);
+                playerMoved = true;
             }
+            return playerMoved;
         }
 
         function sendMove(direction, flip) {
-            console.log('jwtToken', jwtToken);
-            console.log('sessionId', sessionId);
             if (stompClientRef.current && stompClientRef.current.connected) {
                 stompClientRef.current.send('/app/move', JSON.stringify({
                     direction: direction,
@@ -123,16 +175,6 @@ const Game = () => {
             }
         }
 
-        function updateGameState(player, playerPosition) {
-            console.log("New player position:", playerPosition);
-            player.sprite.x = playerPosition.newPositionX;
-            player.sprite.y = playerPosition.newPositionY;
-
-            if (playerPosition.flip !== undefined) {
-                player.sprite.setFlipX(playerPosition.flip)
-            }
-            console.log("Updated player coordinates:", player.sprite.x, player.sprite.y);
-        }
 
         function animateMovement (keys, player){
             const runningKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
@@ -150,17 +192,36 @@ const Game = () => {
             }
         }
 
+        function createPlayerSprite(scene, sessionId) {
+            // Create a new sprite for the player
+            let newPlayerSprite = scene.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
+            newPlayerSprite.displayHeight = PLAYER_HEIGHT;
+            newPlayerSprite.displayWidth = PLAYER_WIDTH;
+            newPlayerSprite.moving = false;
+            players.current.set(sessionId, newPlayerSprite);
+        }
+
+        function removePlayerSprite(sessionId) {
+            let playerSprite = players.current.get(sessionId);
+            if (playerSprite) {
+                playerSprite.destroy();  // Remove the sprite from the game
+                players.current.delete(sessionId);
+            }
+        }
+
 
         return () => {
+            if (stompClientRef.current && stompClientRef.current.connected) {
+                stompClientRef.current.disconnect();
+            }
             game.destroy(true);
         };
-    });
+    })
 
     return(
         <div id="game-container">
-            <canvas/>
         </div>
     )
-};
+}
 
 export default Game;
