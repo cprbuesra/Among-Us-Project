@@ -27,9 +27,14 @@ const Home = () => {
             sessionStorage.setItem('sessionId', response.data.sessionId);
             navigate("/game");
         } catch (error) {
-            if (error.response && error.response.data) {
-                console.log('Error submitting name:', error.response.data);
-                alert('This username is already taken. Please choose another one.');
+            if (error.response) {
+                if (error.response.status === 403) {
+                    console.log('403 error:', error.response.data);
+                    alert('This username is already taken. Please choose another one.');
+                } else if (error.response.data) {
+                    console.log('Error submitting name:', error.response.data);
+                    alert('This username is already taken. Please choose another one.');
+                }
             }
         }
     }

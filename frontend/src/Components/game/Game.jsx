@@ -4,6 +4,7 @@ import shipImg from "./assets/ship.png";
 import playerSprite from "./assets/player.png";
 import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
+import taskImg from "./assets/task.png";
 import {
     PLAYER_SPRITE_HEIGHT,
     PLAYER_SPRITE_WIDTH,
@@ -12,7 +13,6 @@ import {
     PLAYER_HEIGHT,
     PLAYER_WIDTH,
     TASK_POSITIONS,
-    PLAYER_WIDTH,
 } from "./constants";
 
 const Game = () => {
@@ -36,6 +36,8 @@ const Game = () => {
                 update: update
             }
         };
+
+
 
         const game = new Phaser.Game(config);
 
