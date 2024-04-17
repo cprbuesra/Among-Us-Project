@@ -11,6 +11,8 @@ import {
     PLAYER_START_Y,
     PLAYER_HEIGHT,
     PLAYER_WIDTH,
+    TASK_POSITIONS,
+    PLAYER_WIDTH,
 } from "./constants";
 
 const Game = () => {
@@ -51,7 +53,7 @@ const Game = () => {
                 frameHeight: PLAYER_SPRITE_HEIGHT,
             });
 
-
+            this.load.image('task', taskImg);
         }
 
         function create() {
@@ -59,6 +61,64 @@ const Game = () => {
             player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             player.sprite.displayHeight = PLAYER_HEIGHT;
             player.sprite.displayWidth = PLAYER_WIDTH;
+
+            TASK_POSITIONS.forEach((pos) => {
+                const task = this.add.image(pos.x, pos.y, 'task');
+                task.setScale(0.03);
+                task.setInteractive();
+                task.on('pointerdown', () => {
+                    showTaskPopup(this, task);
+
+                });
+            });
+
+            function showTaskPopup(scene, task) {
+                const cam = scene.cameras.main;
+
+                // Background overlay
+                const bg = scene.add.graphics({ fillStyle: { color: 0x000000, alpha: 0.5 } });
+                bg.fillRect(0, 0, cam.width, cam.height);
+                bg.setScrollFactor(0);
+
+                // Popup window
+                const popup = scene.add.rectangle(cam.centerX, cam.centerY, 200, 150, 0xffffff);
+                popup.setScrollFactor(0);
+
+                // Task instructions or status text
+                const text = scene.add.text(cam.centerX, cam.centerY - 20, 'Task Status', { fontSize: '16px', color: '#000' }).setOrigin(0.5);
+                text.setScrollFactor(0);
+
+                // Finish button
+                const finishButton = scene.add.text(cam.centerX - 80, cam.centerY + 20, 'Finish', { fontSize: '18px', color: '#00ff00' }).setInteractive();
+                finishButton.setScrollFactor(0);
+                finishButton.on('pointerdown', () => {
+                    bg.destroy();
+                    popup.destroy();
+                    text.destroy();
+                    closeButton.destroy();
+                    finishButton.destroy();
+                    task.destroy();  // Removes the task from the map
+                });
+
+                // Close button
+                const closeButton = scene.add.text(cam.centerX + 40, cam.centerY + 20, 'Close', { fontSize: '18px', color: '#ff0000' }).setInteractive();
+                closeButton.setScrollFactor(0);
+                closeButton.on('pointerdown', () => {
+                    bg.destroy();
+                    popup.destroy();
+                    text.destroy();
+                    closeButton.destroy();
+                    finishButton.destroy();
+                    // Task remains on the map
+                });
+            }
+
+
+
+            // Tastatureingaben abfangen
+            this.input.keyboard.on('keydown', (event) => {
+                // Tastatureingaben bearbeiten
+            });
 
             players.current.set(sessionId, player.sprite);
 
