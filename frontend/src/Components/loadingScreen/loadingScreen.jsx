@@ -5,9 +5,9 @@ import './LoadingScreen.css';
 function LoadingScreen() {
     const navigate = useNavigate();
 
-    /*setTimeout(() => {
+    setTimeout(() => {
         navigate("/game");
-    }, 5000);*/
+    }, 5000);
 
 
     return (
