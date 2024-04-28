@@ -14,6 +14,7 @@ import {
     PLAYER_WIDTH,
     TASK_POSITIONS,
 } from "./constants";
+import {useNavigate} from "react-router-dom";
 
 const Game = () => {
     const stompClientRef = useRef(null)
@@ -22,11 +23,16 @@ const Game = () => {
     const player = {};
     const players = useRef(new Map());
     const pressedKeys = useRef([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
 
+        if (!jwtToken || !sessionId) {
+            navigate("/");
+        }
+
         const config = {
-            type: Phaser.AUTO,
+            type: Phaser.WEBGL,
             width: window.innerWidth,
             height: window.innerHeight,
             parent: 'game-container',
@@ -135,9 +141,18 @@ const Game = () => {
                 if (!pressedKeys.current.includes(event.code)) {
                     pressedKeys.current.push(event.code);
                 }
+
+                // Check if the key is one of the arrow keys
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.code)) {
+                    event.preventDefault();  // Prevent the default action (scrolling)
+                }
             });
+
             this.input.keyboard.on('keyup', (event) => {
                 pressedKeys.current = pressedKeys.current.filter((key) => key !== event.code);
+                if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.code)) {
+                    event.preventDefault();  // Prevent the default action (scrolling)
+                }
             });
 
 
@@ -173,6 +188,10 @@ const Game = () => {
                         playerSprite.moving = false;
                     }
                 });
+                stompClientRef.current.subscribe('/topic/leave', (message) => {
+                    const disconnectedPlayer = JSON.parse(message.body);
+                    removePlayerSprite(disconnectedPlayer.sessionId);
+                });
             });
         }
 
@@ -193,7 +212,6 @@ const Game = () => {
                 }
             }
             animateMovement(pressedKeys.current, player.sprite)
-            // Animate other players
             players.current.forEach((playerSprite, sessionId) => {
                 if (sessionId !== sessionStorage.getItem('sessionId')) { // Don't update the local player in this loop
                     if (playerSprite.moving && !playerSprite.anims.isPlaying) {
@@ -255,7 +273,6 @@ const Game = () => {
         }
 
         function createPlayerSprite(scene, sessionId) {
-            // Create a new sprite for the player
             let newPlayerSprite = scene.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             newPlayerSprite.displayHeight = PLAYER_HEIGHT;
             newPlayerSprite.displayWidth = PLAYER_WIDTH;
@@ -266,10 +283,24 @@ const Game = () => {
         function removePlayerSprite(sessionId) {
             let playerSprite = players.current.get(sessionId);
             if (playerSprite) {
-                playerSprite.destroy();  // Remove the sprite from the game
+                playerSprite.destroy();
                 players.current.delete(sessionId);
             }
         }
+
+
+
+        window.onbeforeunload = () => {
+            sessionStorage.removeItem('jwtToken');
+            sessionStorage.removeItem('sessionId');
+
+            if (stompClientRef.current && stompClientRef.current.connected) {
+                stompClientRef.current.send('/app/leave', JSON.stringify({
+                    token: jwtToken,
+                    sessionId: sessionId
+                }), {});
+            }
+        };
 
 
         return () => {
@@ -282,6 +313,7 @@ const Game = () => {
 
     return(
         <div id="game-container">
+            <canvas/>
         </div>
     )
 }

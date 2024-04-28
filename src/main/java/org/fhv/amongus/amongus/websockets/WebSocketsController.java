@@ -50,16 +50,6 @@ public class WebSocketsController {
         return "{\"sessionId\": \"" + jwtTokenObj.getSessionId() + "\"}";
     }
 
-    @MessageMapping("/join")
-    @SendTo("/topic/join")
-    public PlayerInfo joinGame(@Payload PlayerInfo playerInfo) throws Exception {
-        String username = _jwtService.extractUsername(playerInfo.getToken());
-
-        JwtToken jwtTokenObj = _jwtService.findByTokenAndSession(playerInfo.getToken(), playerInfo.getSessionId())
-                .orElseThrow(() -> new Exception("JWT Token not found"));
-
-        return new PlayerInfo(playerInfo.getToken(), playerInfo.getSessionId());
-    }
 
     @MessageMapping("/leave")
     @SendTo("/topic/leave")

@@ -2,7 +2,9 @@ package org.fhv.amongus.amongus.player.service;
 
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.amongus.boundaries.BoundaryService;
+import org.fhv.amongus.amongus.exceptions.PlayerNotFoundException;
 import org.fhv.amongus.amongus.jwt.JwtService;
+import org.fhv.amongus.amongus.jwt.JwtTokeRepositoryService;
 import org.fhv.amongus.amongus.jwt.JwtToken;
 import org.fhv.amongus.amongus.jwt.JwtTokenRepository;
 import org.fhv.amongus.amongus.player.DTO.AuthenticationResponse;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -25,11 +28,13 @@ public class PlayerService {
     private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
 
     private final JwtTokenRepository jwtTokenRepository;
+    private final JwtTokeRepositoryService jwtTokeRepositoryService;
     private final PlayerRepository _playerRepository;
     private final JwtService jwtService;
     private final BoundaryService boundaryService;
     final int SHIP_WIDTH = 2160;
     final int SHIP_HEIGHT = 1160;
+    private final PlayerRepositoryService playerRepositoryService;
 
     public AuthenticationResponse savePlayer(RegisterRequest registerRequest) {
         Optional<Player> existingPlayer = _playerRepository.findByUsername(registerRequest.getUsername());
@@ -56,7 +61,7 @@ public class PlayerService {
                     .expirationDate(expiryDate)
                     .sessionId(sessionId)
                     .build();
-            jwtTokenRepository.save(jwtTokenObj);
+            jwtTokeRepositoryService.save(jwtTokenObj);
             logger.info("Saved JWT Token: {}", jwtTokenObj);
 
             return AuthenticationResponse.builder()
@@ -106,15 +111,18 @@ public class PlayerService {
         return _playerRepository.save(player);
     }
 
+    @Transactional
     public void leaveGame(String username) {
         if (username == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is null");
         }
 
-        Player player = _playerRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+        Player player = playerRepositoryService.findByUsername(username)
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
-        _playerRepository.delete(player);
+        logger.info("Deleting player: {}", player);
+        jwtTokeRepositoryService.deleteByPlayer(player);
+        playerRepositoryService.deletePlayer(player);
     }
 
 }
