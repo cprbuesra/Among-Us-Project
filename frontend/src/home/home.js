@@ -39,7 +39,7 @@ import LoadingScreen from "../LoadingScreen/loadingScreen";
         };
 
 
-        let loading;
+       
         return (
         <div className="container" style={{
             backgroundImage: `url(${backgroundImage})`,
@@ -72,7 +72,6 @@ import LoadingScreen from "../LoadingScreen/loadingScreen";
                     <button className="btn btn-danger">play</button>
                 </form>
             </div>
-            {loading && <LoadingScreen />}
         </div>
 
     );
