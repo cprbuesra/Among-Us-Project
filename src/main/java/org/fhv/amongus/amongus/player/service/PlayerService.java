@@ -47,6 +47,7 @@ public class PlayerService {
                     .username(registerRequest.getUsername())
                     .x(335)
                     .y(20)
+                    .flip(false)
                     .build();
             _playerRepository.save(player);
 

@@ -60,7 +60,7 @@ const Lobby = () => {
                     <button
                         id="start-button"
                         onClick={handleStartGame}
-                        //disabled={players.length + (inputName ? 1 : 0) < 5}
+                        disabled={players.length + (inputName ? 1 : 0) < 5}
                     >
                         START
                     </button>

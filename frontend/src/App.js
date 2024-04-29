@@ -3,6 +3,7 @@ import Home from "./Components/home/Home";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Game from "./Components/game/Game";
 import LoadingScreen from "./Components/loadingScreen/loadingScreen";
+import RoomList from "./Components/rooms/Rooms";
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
                     <Route path="/" element={<Home/>} />
                     <Route path="/game" element={<Game/>}/>
                     <Route path="/loadingScreen" element={<LoadingScreen/>}/>
+                    <Route path="/rooms" element={<RoomList/>}/>
                 </Routes>
             </div>
         </Router>

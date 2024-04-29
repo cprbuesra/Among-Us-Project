@@ -20,21 +20,21 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class WebSocketsController {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-    private final PlayerService _playerService;
-    private final JwtService _jwtService;
+    private final PlayerService playerService;
+    private final JwtService jwtService;
 
 
     @MessageMapping("/move")
     @SendTo("/topic/move")
     public PlayerPosition movePlayer(@Payload PlayerMove move) throws Exception {
-        String username = _jwtService.extractUsername(move.getToken());
+        String username = jwtService.extractUsername(move.getToken());
         logger.info("Username: {}", username);
 
-        JwtToken jwtTokenObj = _jwtService.findByTokenAndSession(move.getToken(), move.getSessionId())
+        JwtToken jwtTokenObj = jwtService.findByTokenAndSession(move.getToken(), move.getSessionId())
                 .orElseThrow(() -> new Exception("JWT Token not found"));
 
         logger.info("Retrieved token: {}", jwtTokenObj.getToken());
-        Player player = _playerService.movePlayer(username, move.getDirection(), move.isFlip());
+        Player player = playerService.movePlayer(username, move.getDirection(), move.isFlip());
         PlayerPosition playerPosition = new PlayerPosition(jwtTokenObj.getSessionId(), player.getX(), player.getY(), player.isFlip());
         logger.info("Player moved: {}", playerPosition);
         return playerPosition;
@@ -43,9 +43,9 @@ public class WebSocketsController {
     @MessageMapping("/moveEnd")
     @SendTo("/topic/moveEnd")
     public String moveEnd(@Payload PlayerMove move) throws Exception {
-        String username = _jwtService.extractUsername(move.getToken());
+        String username = jwtService.extractUsername(move.getToken());
 
-        JwtToken jwtTokenObj = _jwtService.findByTokenAndSession(move.getToken(), move.getSessionId())
+        JwtToken jwtTokenObj = jwtService.findByTokenAndSession(move.getToken(), move.getSessionId())
                 .orElseThrow(() -> new Exception("JWT Token not found"));
         return "{\"sessionId\": \"" + jwtTokenObj.getSessionId() + "\"}";
     }
@@ -54,12 +54,12 @@ public class WebSocketsController {
     @MessageMapping("/leave")
     @SendTo("/topic/leave")
     public String leaveGame(@Payload PlayerInfo playerInfo) throws Exception {
-        String username = _jwtService.extractUsername(playerInfo.getToken());
+        String username = jwtService.extractUsername(playerInfo.getToken());
 
-        JwtToken jwtTokenObj = _jwtService.findByTokenAndSession(playerInfo.getToken(), playerInfo.getSessionId())
+        JwtToken jwtTokenObj = jwtService.findByTokenAndSession(playerInfo.getToken(), playerInfo.getSessionId())
                 .orElseThrow(() -> new Exception("JWT Token not found"));
 
-        _playerService.leaveGame(username);
+        playerService.leaveGame(username);
 
         String sessionId = playerInfo.getSessionId();
         return "{\"sessionId\": \"" + sessionId + "\"}";
