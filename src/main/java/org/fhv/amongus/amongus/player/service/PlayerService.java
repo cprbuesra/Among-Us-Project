@@ -126,4 +126,16 @@ public class PlayerService {
         playerRepositoryService.deletePlayer(player);
     }
 
+    public void leaveRoom(Long roomId, String username) throws Exception {
+        if (roomId == null || username == null) {
+            throw new Exception ("Room ID or username is null");
+        }
+
+        Player player = playerRepositoryService.findByUsername(username)
+                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
+
+        player.setGameRoom(null);
+
+        playerRepositoryService.savePlayer(player);
+    }
 }

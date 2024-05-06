@@ -1,6 +1,7 @@
-package org.fhv.amongus.amongus.gameRoom;
+package org.fhv.amongus.amongus.gameRoom.repository;
 
 
+import org.fhv.amongus.amongus.gameRoom.model.GameRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

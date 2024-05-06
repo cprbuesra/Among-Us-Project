@@ -26,8 +26,4 @@ public class PlayerController {
 
     }
 
-    @PostMapping("/move")
-    public Player movePlayer(@RequestBody MoveRequest moveRequest) {
-        return _playerService.movePlayer(moveRequest.getUsername(), moveRequest.getDirection(), moveRequest.isFlip());
-    }
 }

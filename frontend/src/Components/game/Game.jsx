@@ -20,6 +20,7 @@ const Game = () => {
     const stompClientRef = useRef(null)
     const jwtToken = sessionStorage.getItem('jwtToken');
     const sessionId = sessionStorage.getItem('sessionId');
+    const roomId = sessionStorage.getItem('roomId');
     const player = {};
     const players = useRef(new Map());
     const pressedKeys = useRef([]);
@@ -157,7 +158,9 @@ const Game = () => {
 
 
             stompClientRef.current.connect({}, () => {
-                stompClientRef.current.subscribe('/topic/move', (message) => {
+
+
+                stompClientRef.current.subscribe(`/topic/move/${roomId}`, (message) => {
                     const playerPosition = JSON.parse(message.body);
                     console.log('This is the player position from the server: ' + playerPosition);
                     console.log('This is the session ID from the server: ' + playerPosition.sessionId);
@@ -181,8 +184,9 @@ const Game = () => {
                         newPlayerSprite.setFlipX(playerPosition.flip);
                     }
                 });
-                stompClientRef.current.subscribe('/topic/moveEnd', (message) => {
+                stompClientRef.current.subscribe(`/topic/moveEnd/${roomId}`, (message) => {
                     const endMove = JSON.parse(message.body);
+                    console.log('Move ended for player: ' + endMove);
                     const playerSprite = players.current.get(endMove.sessionId);
                     if (playerSprite) {
                         playerSprite.moving = false;
@@ -205,7 +209,8 @@ const Game = () => {
                     if (stompClientRef.current && stompClientRef.current.connected) {
                         stompClientRef.current.send('/app/moveEnd', JSON.stringify({
                             token: jwtToken,
-                            sessionId: sessionId
+                            sessionId: sessionId,
+                            roomId: roomId
                         }), {});
                     }
                     player.movedLastFrame = false;
@@ -250,7 +255,8 @@ const Game = () => {
                     direction: direction,
                     flip: flip,
                     token: jwtToken,
-                    sessionId: sessionId
+                    sessionId: sessionId,
+                    roomId: roomId
                 }), {});
             }
         }
