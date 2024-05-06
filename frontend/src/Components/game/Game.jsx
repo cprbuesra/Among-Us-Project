@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import shipImg from "./assets/ship.png";
 import playerSprite from "./assets/player.png";
 import SockJS from 'sockjs-client';
@@ -14,7 +14,7 @@ import {
     PLAYER_WIDTH,
     TASK_POSITIONS,
 } from "./constants";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 const Game = () => {
     const stompClientRef = useRef(null)
@@ -22,14 +22,23 @@ const Game = () => {
     const sessionId = sessionStorage.getItem('sessionId');
     const player = {};
     const players = useRef(new Map());
+    const [roles, setRoles] = useState([]); // New state for storing roles
     const pressedKeys = useRef([]);
     const navigate = useNavigate();
+    const location = useLocation();
+
 
     useEffect(() => {
 
         if (!jwtToken || !sessionId) {
             navigate("/");
         }
+
+        const passedPlayers = location.state ? location.state.players : [];
+        passedPlayers.forEach(player => {
+            createPlayerSprite(this, player.sessionId, PLAYER_START_X, PLAYER_START_Y, player.username);
+        });
+
 
         const config = {
             type: Phaser.WEBGL,
@@ -42,6 +51,7 @@ const Game = () => {
                 update: update
             }
         };
+
 
 
 
@@ -79,6 +89,9 @@ const Game = () => {
 
                 });
             });
+
+            fetchRoles();
+
 
             function showTaskPopup(scene, task) {
                 const cam = scene.cameras.main;
@@ -303,19 +316,35 @@ const Game = () => {
         };
 
 
+        function fetchRoles() {
+            fetch('http://localhost:8080/player/assignRoles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${jwtToken}` // Make sure to send the auth token
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    setRoles(data.map(player => ({ id: player.id, role: player.role })));
+                    console.log('Roles assigned:', data);
+                })
+                .catch(error => console.error('Error fetching roles:', error));
+        }
+
         return () => {
             if (stompClientRef.current && stompClientRef.current.connected) {
                 stompClientRef.current.disconnect();
             }
             game.destroy(true);
         };
-    })
+    }, []);
 
-    return(
+    return (
         <div id="game-container">
-            <canvas/>
+            <canvas />
         </div>
-    )
-}
+    );
+};
 
 export default Game;

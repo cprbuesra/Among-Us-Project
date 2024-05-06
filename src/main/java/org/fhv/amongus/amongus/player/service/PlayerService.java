@@ -10,6 +10,7 @@ import org.fhv.amongus.amongus.jwt.JwtTokenRepository;
 import org.fhv.amongus.amongus.player.DTO.AuthenticationResponse;
 import org.fhv.amongus.amongus.player.DTO.RegisterRequest;
 import org.fhv.amongus.amongus.player.model.Player;
+import org.fhv.amongus.amongus.player.model.Role;
 import org.fhv.amongus.amongus.player.repository.PlayerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -124,5 +127,24 @@ public class PlayerService {
         jwtTokeRepositoryService.deleteByPlayer(player);
         playerRepositoryService.deletePlayer(player);
     }
+
+
+    public void assignRolesToPlayers() {
+        List<Player> players = _playerRepository.findAll();
+        Collections.shuffle(players);  // Randomize player list
+        int numberOfImpostors = Math.max(1, players.size() / 4);  // Example ratio
+
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).setRole(i < numberOfImpostors ? Role.IMPOSTOR : Role.CREWMATE);
+            _playerRepository.save(players.get(i));  // Save the role to each player
+        }
+    }
+
+    public List<Player> getAllPlayers() {
+        return _playerRepository.findAll();
+    }
+
+
+
 
 }

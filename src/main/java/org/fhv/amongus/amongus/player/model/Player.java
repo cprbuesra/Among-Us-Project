@@ -26,6 +26,7 @@ public class Player implements UserDetails {
     private int x;
     private int y;
     private boolean flip;
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
