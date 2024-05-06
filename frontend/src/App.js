@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Game from "./Components/game/Game";
 import LoadingScreen from "./Components/loadingScreen/loadingScreen";
 import RoomList from "./Components/roomsList/RoomsList";
-import RoomPage from "./Components/RoomPage";
+import RoomPage from "./Components/roomPage/RoomPage";
 
 function App() {
 
