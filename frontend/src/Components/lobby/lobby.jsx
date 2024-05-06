@@ -10,7 +10,7 @@ const Lobby = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const fetchPlayers = async () => {
+    /*const fetchPlayers = async () => {
         try {
             const response = await axios.get('http://localhost:8080/player/list');
             setPlayers(response.data.players);
@@ -21,7 +21,7 @@ const Lobby = () => {
 
     useEffect(() => {
         fetchPlayers();
-    }, []);
+    }, []);*/
 
     useEffect(() => {
         if (location.state && location.state.inputName) {
@@ -44,23 +44,24 @@ const Lobby = () => {
                 <div className="content">
                     <img src={crew} className="crew mb-4" alt="Crew" />
                     <div id="player-list">
-                        {players.map((player, index) => (
+                        {/*{players.map((player, index) => (
                             <div key={index} className="player-name">{player.username}</div>
                         ))}
-                        {inputName && <div className="player-name">{inputName}</div>}
+                        {inputName && <div className="player-name">{inputName}</div>}*/}
+
                     </div>
                 </div>
                 <div id="game-info">
-                    <div id="player-count">
+                    {/*<div id="player-count">
                         <span>{players.length + (inputName ? 1 : 0)}/10</span>
-                    </div>
+                    </div>*/}
                     <div id="player-load">
                         <span></span>
                     </div>
                     <button
                         id="start-button"
                         onClick={handleStartGame}
-                        //disabled={players.length + (inputName ? 1 : 0) < 5}
+                        disabled={players.length + (inputName ? 1 : 0) < 5}
                     >
                         START
                     </button>

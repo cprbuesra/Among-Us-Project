@@ -1,4 +1,5 @@
-package org.fhv.amongus.amongus.player.DTO;
+package org.fhv.amongus.amongus.gameRoom.DTO;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,11 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerMove {
-    private String direction;
-    private boolean flip;
+public class CreateRoomRequest {
     private String token;
     private String sessionId;
-    private String roomId;
+    private String roomName;
 }
-

@@ -33,7 +33,7 @@ public class SecurityConfig {
                 disable()
                 )
                 .authorizeHttpRequests(authorize ->
-                authorize.requestMatchers("/player/**", "/ws/**", "/h2-console/**")
+                authorize.requestMatchers("/api/**","/ws/**", "/h2-console/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

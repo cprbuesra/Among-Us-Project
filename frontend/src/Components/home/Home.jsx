@@ -18,14 +18,14 @@ const Home = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('http://localhost:8080/player/save', {
+            const response = await axios.post('http://localhost:8080/api/player/save', {
                 username: name}
             )
             console.log('Joined successfully: ', response.data);
             alert('Joined successfully')
             sessionStorage.setItem('jwtToken', response.data.token);
             sessionStorage.setItem('sessionId', response.data.sessionId);
-            navigate("/loadingScreen");
+            navigate("/rooms");
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 403) {

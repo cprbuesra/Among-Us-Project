@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/player")
+@RequestMapping("api/player")
 public class PlayerController {
 
     private final PlayerService _playerService;
@@ -26,8 +26,4 @@ public class PlayerController {
 
     }
 
-    @PostMapping("/move")
-    public Player movePlayer(@RequestBody MoveRequest moveRequest) {
-        return _playerService.movePlayer(moveRequest.getUsername(), moveRequest.getDirection(), moveRequest.isFlip());
-    }
 }

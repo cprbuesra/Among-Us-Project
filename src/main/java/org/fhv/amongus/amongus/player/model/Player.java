@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import org.fhv.amongus.amongus.gameRoom.model.GameRoom;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,6 +26,10 @@ public class Player implements UserDetails {
     private int x;
     private int y;
     private boolean flip;
+    @ManyToOne
+    @JoinColumn(name = "gameRoomId")
+    private GameRoom gameRoom;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
