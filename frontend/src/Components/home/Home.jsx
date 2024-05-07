@@ -25,7 +25,7 @@ const Home = () => {
             alert('Joined successfully')
             sessionStorage.setItem('jwtToken', response.data.token);
             sessionStorage.setItem('sessionId', response.data.sessionId);
-            navigate("/loadingScreen");
+            navigate("/loadingScreen", { state: { username: name } });
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 403) {

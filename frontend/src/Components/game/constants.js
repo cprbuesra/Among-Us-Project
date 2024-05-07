@@ -22,8 +22,6 @@ export const TASK_POSITIONS = [
     { x: 20, y: 235 },
     { x: -49, y: 500 },
 
-
-
-
-
 ];
+
+

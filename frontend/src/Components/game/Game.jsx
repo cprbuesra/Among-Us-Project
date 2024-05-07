@@ -16,6 +16,7 @@ import {
 } from "./constants";
 import {useLocation, useNavigate} from "react-router-dom";
 
+
 const Game = () => {
     const stompClientRef = useRef(null)
     const jwtToken = sessionStorage.getItem('jwtToken');
@@ -26,6 +27,9 @@ const Game = () => {
     const pressedKeys = useRef([]);
     const navigate = useNavigate();
     const location = useLocation();
+    const username = location.state?.username; // gets the state information( itc username) from home.jsx
+
+
 
 
     useEffect(() => {
@@ -34,9 +38,9 @@ const Game = () => {
             navigate("/");
         }
 
-        const passedPlayers = location.state ? location.state.players : [];
+        const passedPlayers = location.state && location.state.players? location.state.players : [];
         passedPlayers.forEach(player => {
-            createPlayerSprite(this, player.sessionId, PLAYER_START_X, PLAYER_START_Y, player.username);
+            createPlayerSprite( PLAYER_START_X, PLAYER_START_Y, player.username);
         });
 
 
@@ -80,13 +84,19 @@ const Game = () => {
             player.sprite.displayHeight = PLAYER_HEIGHT;
             player.sprite.displayWidth = PLAYER_WIDTH;
 
+            // Create a text object for the username directly above the player sprite
+            player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
+                fontSize: '16px',
+                color: '#ffffff',
+                align: 'center'
+            }).setOrigin(0.5, 0.5);
+
             TASK_POSITIONS.forEach((pos) => {
                 const task = this.add.image(pos.x, pos.y, 'task');
                 task.setScale(0.03);
                 task.setInteractive();
                 task.on('pointerdown', () => {
                     showTaskPopup(this, task);
-
                 });
             });
 
@@ -210,7 +220,13 @@ const Game = () => {
 
         function update() {
             this.scene.scene.cameras.main.centerOn(player.sprite.x, player.sprite.y);
-            const playerMoved = movePlayer(pressedKeys.current, player.sprite)
+
+            // Ensure the text label follows the player sprite
+            if (player.sprite && player.text) {
+                player.text.setPosition(player.sprite.x, player.sprite.y - 50);
+            }
+
+            const playerMoved = movePlayer(pressedKeys.current, player.sprite);
             if (playerMoved) {
                 player.movedLastFrame = true;
             } else {
@@ -292,6 +308,8 @@ const Game = () => {
             newPlayerSprite.moving = false;
             players.current.set(sessionId, newPlayerSprite);
         }
+
+
 
         function removePlayerSprite(sessionId) {
             let playerSprite = players.current.get(sessionId);

@@ -19,9 +19,7 @@ const Lobby = () => {
         }
     };
 
-    useEffect(() => {
-        fetchPlayers();
-    }, []);
+
 
     useEffect(() => {
         if (location.state && location.state.inputName) {
