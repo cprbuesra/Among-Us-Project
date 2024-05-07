@@ -27,7 +27,8 @@ const Game = () => {
     const pressedKeys = useRef([]);
     const navigate = useNavigate();
     const location = useLocation();
-    const username = location.state?.username; // gets the state information( itc username) from home.jsx
+    const username = location.state?.username;
+
 
 
 
@@ -37,12 +38,6 @@ const Game = () => {
         if (!jwtToken || !sessionId) {
             navigate("/");
         }
-
-        const passedPlayers = location.state && location.state.players? location.state.players : [];
-        passedPlayers.forEach(player => {
-            createPlayerSprite( PLAYER_START_X, PLAYER_START_Y, player.username);
-        });
-
 
         const config = {
             type: Phaser.WEBGL,
@@ -79,17 +74,35 @@ const Game = () => {
         }
 
         function create() {
+
             this.ship = this.add.image(0, 0, 'ship');
+            const passedPlayers = location.state && location.state.players? location.state.players : [];
+            passedPlayers.forEach(player => {
+                createPlayerSprite(PLAYER_START_X, PLAYER_START_Y);
+            });
+            fetchRoles();
             player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             player.sprite.displayHeight = PLAYER_HEIGHT;
             player.sprite.displayWidth = PLAYER_WIDTH;
 
+
             // Create a text object for the username directly above the player sprite
-            player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
-                fontSize: '16px',
-                color: '#ffffff',
-                align: 'center'
-            }).setOrigin(0.5, 0.5);
+            if(player.role === 'IMPOSTOR' ){
+                console.log('This is the role of the player: ' + player.role)
+                player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
+                    fontSize: '20px',
+                    color: '#ff0000',
+                    align: 'center'
+                }).setOrigin(0.5, 0.5);
+            }
+            else{
+                player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
+                    fontSize: '20px',
+                    color: '#127cd9',
+                    align: 'center'
+                }).setOrigin(0.5, 0.5);
+            }
+
 
             TASK_POSITIONS.forEach((pos) => {
                 const task = this.add.image(pos.x, pos.y, 'task');
@@ -100,7 +113,7 @@ const Game = () => {
                 });
             });
 
-            fetchRoles();
+
 
 
             function showTaskPopup(scene, task) {
@@ -216,7 +229,20 @@ const Game = () => {
                     removePlayerSprite(disconnectedPlayer.sessionId);
                 });
             });
+
+            function createPlayerSprite(scene, sessionId) {
+                let newPlayerSprite = scene.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
+                newPlayerSprite.displayHeight = PLAYER_HEIGHT;
+                newPlayerSprite.displayWidth = PLAYER_WIDTH;
+                newPlayerSprite.moving = false;
+                players.current.set(sessionId, newPlayerSprite);
+            }
+
+
+
         }
+
+
 
         function update() {
             this.scene.scene.cameras.main.centerOn(player.sprite.x, player.sprite.y);
@@ -300,15 +326,6 @@ const Game = () => {
                 player.stop('running');
             }
         }
-
-        function createPlayerSprite(scene, sessionId) {
-            let newPlayerSprite = scene.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
-            newPlayerSprite.displayHeight = PLAYER_HEIGHT;
-            newPlayerSprite.displayWidth = PLAYER_WIDTH;
-            newPlayerSprite.moving = false;
-            players.current.set(sessionId, newPlayerSprite);
-        }
-
 
 
         function removePlayerSprite(sessionId) {

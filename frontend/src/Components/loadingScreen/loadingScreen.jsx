@@ -1,16 +1,19 @@
-import {useLocation, useNavigate} from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './LoadingScreen.css';
-
 
 function LoadingScreen() {
     const location = useLocation();
-    const username = location.state?.username; // retrieve username passed from Home.jsx
     const navigate = useNavigate();
+    const username = location.state?.username;
 
-    setTimeout(() => {
-        navigate("/game", { state: { username: username } });
-    }, 5000);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            navigate("/game", { state: { username: username } });
+        }, 5000);
 
+        return () => clearTimeout(timer);
+    }, [navigate, username]);
 
     return (
         <div className="among-us-loading-screen">
@@ -19,6 +22,5 @@ function LoadingScreen() {
         </div>
     );
 }
-
 
 export default LoadingScreen;
