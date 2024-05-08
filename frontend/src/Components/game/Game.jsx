@@ -31,13 +31,14 @@ const Game = () => {
 
 
 
-
-
     useEffect(() => {
 
-        if (!jwtToken || !sessionId) {
+        if (jwtToken && sessionId) {
+            fetchRoles();
+        } else {
             navigate("/");
         }
+
 
         const config = {
             type: Phaser.WEBGL,
@@ -53,8 +54,9 @@ const Game = () => {
 
 
 
-
         const game = new Phaser.Game(config);
+
+
 
         function preload() {
             const socket = new SockJS('http://localhost:8080/ws');
@@ -74,13 +76,11 @@ const Game = () => {
         }
 
         function create() {
-
             this.ship = this.add.image(0, 0, 'ship');
             const passedPlayers = location.state && location.state.players? location.state.players : [];
             passedPlayers.forEach(player => {
                 createPlayerSprite(PLAYER_START_X, PLAYER_START_Y);
             });
-            fetchRoles();
             player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             player.sprite.displayHeight = PLAYER_HEIGHT;
             player.sprite.displayWidth = PLAYER_WIDTH;
@@ -359,10 +359,19 @@ const Game = () => {
                     'Authorization': `Bearer ${jwtToken}` // Make sure to send the auth token
                 }
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     setRoles(data.map(player => ({ id: player.id, role: player.role })));
                     console.log('Roles assigned:', data);
+                    const currentPlayer = data.find(p => p.id === player.id);
+                    if (currentPlayer) {
+                        player.role = currentPlayer.role;
+                    }
                 })
                 .catch(error => console.error('Error fetching roles:', error));
         }
