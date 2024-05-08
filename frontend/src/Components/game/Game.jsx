@@ -28,6 +28,7 @@ const Game = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const username = location.state?.username;
+    const passedPlayers = location.state?.players ?? [];
 
 
 
@@ -53,7 +54,6 @@ const Game = () => {
         };
 
 
-
         const game = new Phaser.Game(config);
 
 
@@ -77,9 +77,8 @@ const Game = () => {
 
         function create() {
             this.ship = this.add.image(0, 0, 'ship');
-            const passedPlayers = location.state && location.state.players? location.state.players : [];
             passedPlayers.forEach(player => {
-                createPlayerSprite(PLAYER_START_X, PLAYER_START_Y);
+                createPlayerSprite(PLAYER_START_X, PLAYER_START_Y,player.role);
             });
             player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             player.sprite.displayHeight = PLAYER_HEIGHT;
@@ -87,7 +86,7 @@ const Game = () => {
 
 
             // Create a text object for the username directly above the player sprite
-            if(player.role === 'IMPOSTOR' ){
+            if(player.role === 0 ){
                 console.log('This is the role of the player: ' + player.role)
                 player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
                     fontSize: '20px',
@@ -95,7 +94,7 @@ const Game = () => {
                     align: 'center'
                 }).setOrigin(0.5, 0.5);
             }
-            else{
+            else {
                 player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
                     fontSize: '20px',
                     color: '#127cd9',
@@ -236,6 +235,8 @@ const Game = () => {
                 newPlayerSprite.displayWidth = PLAYER_WIDTH;
                 newPlayerSprite.moving = false;
                 players.current.set(sessionId, newPlayerSprite);
+
+
             }
 
 

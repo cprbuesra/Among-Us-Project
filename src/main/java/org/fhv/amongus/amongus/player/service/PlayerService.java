@@ -131,13 +131,14 @@ public class PlayerService {
 
     public void assignRolesToPlayers() {
         List<Player> players = _playerRepository.findAll();
-        Collections.shuffle(players);  // Randomize player list
-        int numberOfImpostors = Math.max(1, players.size() / 4);  // Example ratio
+        Collections.shuffle(players);
+        int numberOfImpostors = Math.max(1, players.size() / 4);
 
         for (int i = 0; i < players.size(); i++) {
-            players.get(i).setRole(i < numberOfImpostors ? Role.IMPOSTOR : Role.CREWMATE);
-            _playerRepository.save(players.get(i));  // Save the role to each player
+            players.get(i).setRole(i < numberOfImpostors ? Role.IMPOSTER : Role.CREWMATE);
+            _playerRepository.save(players.get(i));
         }
+
     }
 
     public List<Player> getAllPlayers() {
