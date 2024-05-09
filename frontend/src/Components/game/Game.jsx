@@ -15,27 +15,28 @@ import {
     TASK_POSITIONS,
 } from "./constants";
 import {useLocation, useNavigate} from "react-router-dom";
+import axios from "axios";
 
 
 const Game = () => {
     const stompClientRef = useRef(null)
     const jwtToken = sessionStorage.getItem('jwtToken');
     const sessionId = sessionStorage.getItem('sessionId');
+    const playerId = sessionStorage.getItem('playerId');
     const player = {};
     const players = useRef(new Map());
-    const [roles, setRoles] = useState([]); // New state for storing roles
+    const [roles, setRoles] = useState([]);
     const pressedKeys = useRef([]);
     const navigate = useNavigate();
     const location = useLocation();
     const username = location.state?.username;
-    const passedPlayers = location.state?.players ?? [];
 
 
 
     useEffect(() => {
 
         if (jwtToken && sessionId) {
-            fetchRoles();
+            fetchRoles().then(r => console.log('Roles fetched'));
         } else {
             navigate("/");
         }
@@ -77,24 +78,24 @@ const Game = () => {
 
         function create() {
             this.ship = this.add.image(0, 0, 'ship');
-            passedPlayers.forEach(player => {
-                createPlayerSprite(PLAYER_START_X, PLAYER_START_Y,player.role);
-            });
             player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             player.sprite.displayHeight = PLAYER_HEIGHT;
             player.sprite.displayWidth = PLAYER_WIDTH;
+            // Set the role of the player to the role assigned by the server
+            player.role = roles.find(p => p.id.toString() === playerId)?.role;
+
 
 
             // Create a text object for the username directly above the player sprite
-            if(player.role === 0 ){
-                console.log('This is the role of the player: ' + player.role)
+            if(player.role === 'IMPOSTER' ){
+                console.log('This role should be Imposter: ' + player.role)
                 player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
                     fontSize: '20px',
                     color: '#ff0000',
                     align: 'center'
                 }).setOrigin(0.5, 0.5);
-            }
-            else {
+            } else {
+                console.log('This role should be Crewmate: ' + player.role)
                 player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
                     fontSize: '20px',
                     color: '#127cd9',
@@ -229,11 +230,12 @@ const Game = () => {
                 });
             });
 
-            function createPlayerSprite(scene, sessionId) {
+            function createPlayerSprite(scene, sessionId, playerRole) {
                 let newPlayerSprite = scene.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
                 newPlayerSprite.displayHeight = PLAYER_HEIGHT;
                 newPlayerSprite.displayWidth = PLAYER_WIDTH;
                 newPlayerSprite.moving = false;
+                newPlayerSprite.role = playerRole;
                 players.current.set(sessionId, newPlayerSprite);
 
 
@@ -352,29 +354,19 @@ const Game = () => {
         };
 
 
-        function fetchRoles() {
-            fetch('http://localhost:8080/player/assignRoles', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${jwtToken}` // Make sure to send the auth token
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
+        async function fetchRoles() {
+            try {
+                const response = await axios.post('http://localhost:8080/player/assignRoles', {
+                    token: jwtToken,
+                    sessionId: sessionId
                 })
-                .then(data => {
-                    setRoles(data.map(player => ({ id: player.id, role: player.role })));
-                    console.log('Roles assigned:', data);
-                    const currentPlayer = data.find(p => p.id === player.id);
-                    if (currentPlayer) {
-                        player.role = currentPlayer.role;
-                    }
-                })
-                .catch(error => console.error('Error fetching roles:', error));
+                console.log('Roles assigned:', response);
+                const roles = response.data.players.map(player => ({id: player.playerId, role: player.role}));
+                console.log('Roles:', roles);
+                setRoles(roles);
+            } catch (error) {
+                console.error('Error fetching roles:', error);
+            }
         }
 
         return () => {

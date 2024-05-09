@@ -53,6 +53,7 @@ public class PlayerService {
                     .build();
             _playerRepository.save(player);
 
+
             var jwtToken = jwtService.generateToken(player);
             logger.info("Generated JWT Token: {}", jwtToken);
             var expiryDate = jwtService.extractExpiration(jwtToken);
@@ -64,12 +65,14 @@ public class PlayerService {
                     .expirationDate(expiryDate)
                     .sessionId(sessionId)
                     .build();
+
             jwtTokeRepositoryService.save(jwtTokenObj);
             logger.info("Saved JWT Token: {}", jwtTokenObj);
 
             return AuthenticationResponse.builder()
                     .token(jwtToken)
                     .sessionId(sessionId)
+                    .playerId(player.getPlayerId())
                     .build();
         }
     }
@@ -129,7 +132,11 @@ public class PlayerService {
     }
 
 
-    public void assignRolesToPlayers() {
+    public void assignRolesToPlayers(String token, String sessionId) throws Exception {
+        String username = jwtService.extractUsername(token);
+        JwtToken jwtToken = jwtService.findByTokenAndSession(token, sessionId)
+                .orElseThrow(() -> new Exception("Token not found"));
+
         List<Player> players = _playerRepository.findAll();
         Collections.shuffle(players);
         int numberOfImpostors = Math.max(1, players.size() / 4);

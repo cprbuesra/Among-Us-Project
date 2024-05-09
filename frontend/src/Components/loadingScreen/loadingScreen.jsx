@@ -10,7 +10,7 @@ function LoadingScreen() {
     useEffect(() => {
         const timer = setTimeout(() => {
             navigate("/game", { state: { username: username } });
-        }, 5000);
+        }, 1000);
 
         return () => clearTimeout(timer);
     }, [navigate, username]);
