@@ -74,14 +74,14 @@ function RoomPage() {
             <button className="refresh-btn" onClick={refreshPlayers}>Refresh</button>
             <div className="button-container">
                 <button className="leave-room-btn" onClick={handleLeaveRoom}>Leave Room</button>
-                {isStartGameEnabled && (
+                {/*{isStartGameEnabled && (*/}
                     <button
                         className="start-game-btn"
                         onClick={handleStartGame}
                     >
                         Start Game
                     </button>
-                )}
+                {/*)}*/}
             </div>
         </div>
     );
@@ -91,3 +91,5 @@ function RoomPage() {
 export default RoomPage;
 
 //ToDo: When a player closes the tab, the player should be removed from the room
+//ToDo: When the host closes the tab, the room should be deleted
+//ToDo: When the host starts the game, the game should start for all players in the room
