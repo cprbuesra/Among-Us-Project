@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import shipImg from "./assets/ship.png";
 import playerSprite from "./assets/player.png";
 import SockJS from 'sockjs-client';
@@ -14,23 +14,34 @@ import {
     PLAYER_WIDTH,
     TASK_POSITIONS,
 } from "./constants";
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
+import axios from "axios";
+
 
 const Game = () => {
     const stompClientRef = useRef(null)
     const jwtToken = sessionStorage.getItem('jwtToken');
     const sessionId = sessionStorage.getItem('sessionId');
+    const playerId = sessionStorage.getItem('playerId');
     const roomId = sessionStorage.getItem('roomId');
     const player = {};
     const players = useRef(new Map());
+    const [roles, setRoles] = useState([]);
     const pressedKeys = useRef([]);
     const navigate = useNavigate();
+    const location = useLocation();
+    const username = location.state?.username;
+
+
 
     useEffect(() => {
 
-        if (!jwtToken || !sessionId) {
+        if (jwtToken && sessionId) {
+            fetchRoles().then(r => console.log('Roles fetched'));
+        } else {
             navigate("/");
         }
+
 
         const config = {
             type: Phaser.WEBGL,
@@ -70,6 +81,28 @@ const Game = () => {
             player.sprite = this.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
             player.sprite.displayHeight = PLAYER_HEIGHT;
             player.sprite.displayWidth = PLAYER_WIDTH;
+            // Set the role of the player to the role assigned by the server
+            player.role = roles.find(p => p.id.toString() === playerId)?.role;
+
+
+
+            // Create a text object for the username directly above the player sprite
+            if(player.role === 'IMPOSTER' ){
+                console.log('This role should be Imposter: ' + player.role)
+                player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
+                    fontSize: '20px',
+                    color: '#ff0000',
+                    align: 'center'
+                }).setOrigin(0.5, 0.5);
+            } else {
+                console.log('This role should be Crewmate: ' + player.role)
+                player.text = this.add.text(PLAYER_START_X, PLAYER_START_Y - 50, username, {
+                    fontSize: '20px',
+                    color: '#127cd9',
+                    align: 'center'
+                }).setOrigin(0.5, 0.5);
+            }
+
 
             TASK_POSITIONS.forEach((pos) => {
                 const task = this.add.image(pos.x, pos.y, 'task');
@@ -197,11 +230,31 @@ const Game = () => {
                     removePlayerSprite(disconnectedPlayer.sessionId);
                 });
             });
+
+            function createPlayerSprite(scene, sessionId, playerRole) {
+                let newPlayerSprite = scene.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
+                newPlayerSprite.displayHeight = PLAYER_HEIGHT;
+                newPlayerSprite.displayWidth = PLAYER_WIDTH;
+                newPlayerSprite.moving = false;
+                newPlayerSprite.role = playerRole;
+                players.current.set(sessionId, newPlayerSprite);
+
+
+            }
+
+
+
         }
 
         function update() {
             this.scene.scene.cameras.main.centerOn(player.sprite.x, player.sprite.y);
-            const playerMoved = movePlayer(pressedKeys.current, player.sprite)
+
+            // Ensure the text label follows the player sprite
+            if (player.sprite && player.text) {
+                player.text.setPosition(player.sprite.x, player.sprite.y - 50);
+            }
+
+            const playerMoved = movePlayer(pressedKeys.current, player.sprite);
             if (playerMoved) {
                 player.movedLastFrame = true;
             } else {
@@ -278,13 +331,6 @@ const Game = () => {
             }
         }
 
-        function createPlayerSprite(scene, sessionId) {
-            let newPlayerSprite = scene.add.sprite(PLAYER_START_X, PLAYER_START_Y, 'player');
-            newPlayerSprite.displayHeight = PLAYER_HEIGHT;
-            newPlayerSprite.displayWidth = PLAYER_WIDTH;
-            newPlayerSprite.moving = false;
-            players.current.set(sessionId, newPlayerSprite);
-        }
 
         function removePlayerSprite(sessionId) {
             let playerSprite = players.current.get(sessionId);
@@ -309,19 +355,34 @@ const Game = () => {
         };
 
 
+        async function fetchRoles() {
+            try {
+                const response = await axios.post('http://localhost:8080/player/assignRoles', {
+                    token: jwtToken,
+                    sessionId: sessionId
+                })
+                console.log('Roles assigned:', response);
+                const roles = response.data.players.map(player => ({id: player.playerId, role: player.role}));
+                console.log('Roles:', roles);
+                setRoles(roles);
+            } catch (error) {
+                console.error('Error fetching roles:', error);
+            }
+        }
+
         return () => {
             if (stompClientRef.current && stompClientRef.current.connected) {
                 stompClientRef.current.disconnect();
             }
             game.destroy(true);
         };
-    })
+    }, []);
 
     return(
         <div id="game-container">
             <canvas/>
         </div>
-    )
-}
+    );
+};
 
 export default Game;

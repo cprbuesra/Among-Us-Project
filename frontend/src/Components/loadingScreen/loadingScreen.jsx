@@ -1,4 +1,4 @@
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import './LoadingScreen.css';
 import {useEffect, useRef} from "react";
 import SockJS from "sockjs-client";
@@ -10,7 +10,9 @@ function LoadingScreen() {
     const sessionId = sessionStorage.getItem('sessionId');
     const token = sessionStorage.getItem('jwtToken');
     const roomId = sessionStorage.getItem('roomId');
+    const location = useLocation();
     const navigate = useNavigate();
+    const username = location.state?.username;
 
     useEffect(() => {
         const socket = new SockJS('http://localhost:8080/ws');

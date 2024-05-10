@@ -10,6 +10,7 @@ import org.fhv.amongus.amongus.jwt.JwtTokenRepository;
 import org.fhv.amongus.amongus.player.DTO.AuthenticationResponse;
 import org.fhv.amongus.amongus.player.DTO.RegisterRequest;
 import org.fhv.amongus.amongus.player.model.Player;
+import org.fhv.amongus.amongus.player.model.Role;
 import org.fhv.amongus.amongus.player.repository.PlayerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,6 +54,7 @@ public class PlayerService {
                     .build();
             _playerRepository.save(player);
 
+
             var jwtToken = jwtService.generateToken(player);
             logger.info("Generated JWT Token: {}", jwtToken);
             var expiryDate = jwtService.extractExpiration(jwtToken);
@@ -62,12 +66,14 @@ public class PlayerService {
                     .expirationDate(expiryDate)
                     .sessionId(sessionId)
                     .build();
+
             jwtTokeRepositoryService.save(jwtTokenObj);
             logger.info("Saved JWT Token: {}", jwtTokenObj);
 
             return AuthenticationResponse.builder()
                     .token(jwtToken)
                     .sessionId(sessionId)
+                    .playerId(player.getPlayerId())
                     .build();
         }
     }
@@ -138,4 +144,29 @@ public class PlayerService {
 
         playerRepositoryService.savePlayer(player);
     }
+
+
+    public void assignRolesToPlayers(String token, String sessionId) throws Exception {
+        String username = jwtService.extractUsername(token);
+        JwtToken jwtToken = jwtService.findByTokenAndSession(token, sessionId)
+                .orElseThrow(() -> new Exception("Token not found"));
+
+        List<Player> players = _playerRepository.findAll();
+        Collections.shuffle(players);
+        int numberOfImpostors = Math.max(1, players.size() / 4);
+
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).setRole(i < numberOfImpostors ? Role.IMPOSTER : Role.CREWMATE);
+            _playerRepository.save(players.get(i));
+        }
+
+    }
+
+    public List<Player> getAllPlayers() {
+        return _playerRepository.findAll();
+    }
+
+
+
+
 }

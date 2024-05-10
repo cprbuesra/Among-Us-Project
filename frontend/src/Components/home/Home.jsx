@@ -25,7 +25,10 @@ const Home = () => {
             alert('Joined successfully')
             sessionStorage.setItem('jwtToken', response.data.token);
             sessionStorage.setItem('sessionId', response.data.sessionId);
+            sessionStorage.setItem('playerId', response.data.playerId);
+            //TODO: navigate to the rigth page with the right state
             navigate("/rooms");
+            navigate("/loadingScreen", { state: { username: name } });
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 403) {

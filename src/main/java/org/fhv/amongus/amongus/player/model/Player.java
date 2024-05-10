@@ -30,6 +30,7 @@ public class Player implements UserDetails {
     @JoinColumn(name = "gameRoomId")
     private GameRoom gameRoom;
 
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
