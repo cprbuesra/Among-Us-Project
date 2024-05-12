@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import ConfirmationModal from "../ConfirmationModel";
 import React, {useEffect, useRef, useState} from "react";
 import shipImg from "./assets/ship.png";
 import playerSprite from "./assets/player.png";
@@ -19,7 +20,7 @@ import axios from "axios";
 
 
 const Game = () => {
-    const stompClientRef = useRef(null)
+
     const jwtToken = sessionStorage.getItem('jwtToken');
     const sessionId = sessionStorage.getItem('sessionId');
     const playerId = sessionStorage.getItem('playerId');
@@ -28,19 +29,30 @@ const Game = () => {
     const players = useRef(new Map());
     const [roles, setRoles] = useState([]);
     const pressedKeys = useRef([]);
+
     const navigate = useNavigate();
     const location = useLocation();
     const username = location.state?.username;
 
+    const stompClientRef = useRef(null)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isReadyToNavigate, setIsReadyToNavigate] = useState(false);
+
 
 
     useEffect(() => {
+        fetchRoles().then(r => console.log('Roles fetched'));
 
-        if (jwtToken && sessionId) {
-            fetchRoles().then(r => console.log('Roles fetched'));
-        } else {
-            navigate("/");
-        }
+        const handleBeforeUnload = (e) => {
+            if (!isReadyToNavigate) {
+                setIsModalOpen(true);
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
 
 
         const config = {
@@ -176,9 +188,8 @@ const Game = () => {
                     pressedKeys.current.push(event.code);
                 }
 
-                // Check if the key is one of the arrow keys
                 if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.code)) {
-                    event.preventDefault();  // Prevent the default action (scrolling)
+                    event.preventDefault();
                 }
             });
 
@@ -241,9 +252,6 @@ const Game = () => {
 
 
             }
-
-
-
         }
 
         function update() {
@@ -342,19 +350,6 @@ const Game = () => {
 
 
 
-        window.onbeforeunload = () => {
-            sessionStorage.removeItem('jwtToken');
-            sessionStorage.removeItem('sessionId');
-
-            if (stompClientRef.current && stompClientRef.current.connected) {
-                stompClientRef.current.send('/app/leave', JSON.stringify({
-                    token: jwtToken,
-                    sessionId: sessionId
-                }), {});
-            }
-        };
-
-
         async function fetchRoles() {
             try {
                 const response = await axios.post('http://localhost:8080/player/assignRoles', {
@@ -371,15 +366,42 @@ const Game = () => {
         }
 
         return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
             if (stompClientRef.current && stompClientRef.current.connected) {
                 stompClientRef.current.disconnect();
             }
             game.destroy(true);
         };
-    }, []);
+    }, [isModalOpen, isReadyToNavigate, jwtToken, player, playerId, roles, roomId, sessionId, username]);
+
+    const handleConfirmNavigation = () => {
+        sessionStorage.removeItem('jwtToken');
+        sessionStorage.removeItem('sessionId');
+
+        if (stompClientRef.current && stompClientRef.current.connected) {
+            stompClientRef.current.send('/app/leave', JSON.stringify({
+                token: jwtToken,
+                sessionId: sessionId
+            }), {});
+        }
+        setIsReadyToNavigate(true);
+        navigate('/');
+    };
+
+    const handleCancelNavigation = () => {
+        setIsModalOpen(false);
+    }
 
     return(
         <div id="game-container">
+            {isModalOpen && (
+                <ConfirmationModal
+                    isOpen={isModalOpen}
+                    onConfirm={handleConfirmNavigation}
+                    onCancel={handleCancelNavigation}
+                    message="Are you sure you want to leave the game?"
+                />
+            )}
             <canvas/>
         </div>
     );

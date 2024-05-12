@@ -28,7 +28,7 @@ const Home = () => {
             sessionStorage.setItem('playerId', response.data.playerId);
             //TODO: navigate to the rigth page with the right state
             navigate("/rooms");
-            navigate("/loadingScreen", { state: { username: name } });
+            //navigate("/loadingScreen", { state: { username: name } });
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 403) {

@@ -3,10 +3,11 @@ package org.fhv.amongus.amongus.player.service;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.amongus.boundaries.BoundaryService;
 import org.fhv.amongus.amongus.exceptions.PlayerNotFoundException;
+import org.fhv.amongus.amongus.gameRoom.model.GameRoom;
+import org.fhv.amongus.amongus.gameRoom.service.GameRoomRepositoryService;
 import org.fhv.amongus.amongus.jwt.JwtService;
 import org.fhv.amongus.amongus.jwt.JwtTokeRepositoryService;
 import org.fhv.amongus.amongus.jwt.JwtToken;
-import org.fhv.amongus.amongus.jwt.JwtTokenRepository;
 import org.fhv.amongus.amongus.player.DTO.AuthenticationResponse;
 import org.fhv.amongus.amongus.player.DTO.RegisterRequest;
 import org.fhv.amongus.amongus.player.model.Player;
@@ -30,17 +31,17 @@ public class PlayerService {
 
     private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
 
-    private final JwtTokenRepository jwtTokenRepository;
     private final JwtTokeRepositoryService jwtTokeRepositoryService;
-    private final PlayerRepository _playerRepository;
+    private final PlayerRepository playerRepository;
     private final JwtService jwtService;
+    private final GameRoomRepositoryService gameRoomRepositoryService;
     private final BoundaryService boundaryService;
     final int SHIP_WIDTH = 2160;
     final int SHIP_HEIGHT = 1160;
     private final PlayerRepositoryService playerRepositoryService;
 
     public AuthenticationResponse savePlayer(RegisterRequest registerRequest) {
-        Optional<Player> existingPlayer = _playerRepository.findByUsername(registerRequest.getUsername());
+        Optional<Player> existingPlayer = playerRepository.findByUsername(registerRequest.getUsername());
         if (existingPlayer.isPresent()) {
             logger.warn("Player with Username: {} already exists with ID: {}", registerRequest.getUsername(), existingPlayer.get().getPlayerId());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Player already exists");
@@ -52,7 +53,7 @@ public class PlayerService {
                     .y(20)
                     .flip(false)
                     .build();
-            _playerRepository.save(player);
+            playerRepository.save(player);
 
 
             var jwtToken = jwtService.generateToken(player);
@@ -83,7 +84,7 @@ public class PlayerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username or direction is null");
         }
 
-        Player player = _playerRepository.findByUsername(username)
+        Player player = playerRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
 
         int movementSpeed = 4;
@@ -115,11 +116,11 @@ public class PlayerService {
             player.setY(newY);
             player.setFlip(flip);
         }
-        return _playerRepository.save(player);
+        return playerRepository.save(player);
     }
 
     @Transactional
-    public void leaveGame(String username) {
+    public void leaveGame(String username) throws Exception {
         if (username == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username is null");
         }
@@ -127,23 +128,17 @@ public class PlayerService {
         Player player = playerRepositoryService.findByUsername(username)
                 .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
 
+        GameRoom gameRoom = player.getGameRoom();
+
+        JwtToken jwtToken = jwtTokeRepositoryService.findByPlayer(player)
+                .orElseThrow(() -> new Exception("Token not found"));
+
         logger.info("Deleting player: {}", player);
         jwtTokeRepositoryService.deleteByPlayer(player);
+        gameRoomRepositoryService.leaveGameRoom(gameRoom.getId(), jwtToken.getToken(), jwtToken.getSessionId());
         playerRepositoryService.deletePlayer(player);
     }
 
-    public void leaveRoom(Long roomId, String username) throws Exception {
-        if (roomId == null || username == null) {
-            throw new Exception ("Room ID or username is null");
-        }
-
-        Player player = playerRepositoryService.findByUsername(username)
-                .orElseThrow(() -> new PlayerNotFoundException("Player not found"));
-
-        player.setGameRoom(null);
-
-        playerRepositoryService.savePlayer(player);
-    }
 
 
     public void assignRolesToPlayers(String token, String sessionId) throws Exception {
@@ -151,19 +146,19 @@ public class PlayerService {
         JwtToken jwtToken = jwtService.findByTokenAndSession(token, sessionId)
                 .orElseThrow(() -> new Exception("Token not found"));
 
-        List<Player> players = _playerRepository.findAll();
+        List<Player> players = playerRepository.findAll();
         Collections.shuffle(players);
         int numberOfImpostors = Math.max(1, players.size() / 4);
 
         for (int i = 0; i < players.size(); i++) {
             players.get(i).setRole(i < numberOfImpostors ? Role.IMPOSTER : Role.CREWMATE);
-            _playerRepository.save(players.get(i));
+            playerRepository.save(players.get(i));
         }
 
     }
 
     public List<Player> getAllPlayers() {
-        return _playerRepository.findAll();
+        return playerRepository.findAll();
     }
 
 

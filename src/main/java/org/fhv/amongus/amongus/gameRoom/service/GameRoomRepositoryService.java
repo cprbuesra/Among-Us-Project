@@ -89,7 +89,6 @@ public class GameRoomRepositoryService {
         }
 
         gameRoomRepository.delete(gameRoom);
-
     }
 
     public GameRoomDTO leaveGameRoom(Long roomId, String token, String sessionId) {
@@ -113,4 +112,5 @@ public class GameRoomRepositoryService {
         GameRoom updatedRoom = gameRoomRepository.save(gameRoom);
         return GameRoomMapper.toDTO(updatedRoom);
     }
+
 }
