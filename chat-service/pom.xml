@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.FHV.AmongUs</groupId>
-    <artifactId>chat</artifactId>
+    <artifactId>chat-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>chat</name>
     <description>chat</description>

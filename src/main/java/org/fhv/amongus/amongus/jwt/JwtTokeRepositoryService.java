@@ -22,7 +22,6 @@ public class JwtTokeRepositoryService {
         jwtTokenRepository.save(jwtTokenObj);
     }
 
-    // I need to find the token and session id by player
     public Optional<JwtToken> findByPlayer(Player player) {
         return jwtTokenRepository.findByPlayer(player);
     }
