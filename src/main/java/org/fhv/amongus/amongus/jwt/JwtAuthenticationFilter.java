@@ -20,7 +20,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService _jwtService;
+    private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -41,15 +41,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwtToken = authorizationHeader.substring(7);
-        username = _jwtService.extractUsername(jwtToken);
+        username = jwtService.extractUsername(jwtToken);
 
         if (username != null && sessionIdHeader != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            JwtToken jwtTokenObj = _jwtService.findByTokenAndSession(jwtToken, sessionIdHeader)
+            JwtToken jwtTokenObj = jwtService.findByTokenAndSession(jwtToken, sessionIdHeader)
                     .orElseThrow(() -> new RuntimeException("Invalid token and session id combination"));
 
-            if (_jwtService.isTokenValid(jwtToken, userDetails) && !jwtTokenObj.getExpirationDate().before(new Date())) {
+            if (jwtService.isTokenValid(jwtToken, userDetails) && !jwtTokenObj.getExpirationDate().before(new Date())) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

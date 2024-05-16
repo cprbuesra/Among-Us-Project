@@ -6,6 +6,11 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/chat/pom.xml" />
+        <option value="$PROJECT_DIR$/chat-service/pom.xml" />
+        <option value="$PROJECT_DIR$/authentication-service/pom.xml" />
+        <option value="$PROJECT_DIR$/player-service/pom.xml" />
+        <option value="$PROJECT_DIR$/game-room-service/pom.xml" />
+        <option value="$PROJECT_DIR$/movement-service/pom.xml" />
       </list>
     </option>
   </component>

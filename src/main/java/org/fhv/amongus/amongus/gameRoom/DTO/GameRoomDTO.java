@@ -18,5 +18,4 @@ public class GameRoomDTO {
         private boolean started;
         private String createdBy;
         private List<PlayerDTO> players;
-
 }
