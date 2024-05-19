@@ -6,6 +6,7 @@ import org.fhv.amongus.player.jwt.DTO.AuthResponse;
 import org.fhv.amongus.player.jwt.model.JwtToken;
 import org.fhv.amongus.player.jwt.service.JwtTokenRepositoryService;
 import org.fhv.amongus.player.jwt.service.JwtTokenService;
+import org.fhv.amongus.player.player.model.Action;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.model.Role;
 import org.fhv.amongus.player.player.repository.PlayerRepository;
@@ -19,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.fhv.amongus.player.player.model.Action.KILL;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +87,13 @@ public class PlayerService {
             playerRepository.save(players.get(i));
         }
 
+    }
+    public void performAction(Player player, Action action, Player targetPlayer){
+        switch (action){
+            case KILL:
+                player.eliminatePlayer(targetPlayer, action);
+                break;
+        }
     }
 
     public List<Player> getAllPlayers() {

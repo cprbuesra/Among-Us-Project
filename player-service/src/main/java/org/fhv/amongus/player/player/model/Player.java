@@ -23,8 +23,24 @@ public class Player implements UserDetails {
     private int x;
     private int y;
     private boolean flip;
+    @Setter
     private Role role;
+    private static final double NEAR_DISTANCE = 1.5;
 
+    private double calculateDistance(Player otherPlayer){
+        int xDistance = Math.abs(this.x - otherPlayer.getX());
+        int yDistance = Math.abs(this.y - otherPlayer.getY());
+        return Math.sqrt((xDistance * xDistance + yDistance * yDistance));
+    }
+
+    public void eliminatePlayer(Player otherPlayer, Action action){
+        if (action == Action.KILL && this.role == Role.IMPOSTER){
+            double distance = calculateDistance(otherPlayer);
+            if (distance <= NEAR_DISTANCE){
+                otherPlayer.setRole(Role.GHOST);
+            }
+        }
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

@@ -3,15 +3,13 @@ package org.fhv.amongus.player.player.controller;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.player.jwt.DTO.AuthRequest;
 import org.fhv.amongus.player.jwt.DTO.AuthResponse;
+import org.fhv.amongus.player.player.DTO.ActionRequest;
 import org.fhv.amongus.player.player.DTO.AssignRoles;
 import org.fhv.amongus.player.player.DTO.AssignRolesDTO;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.service.PlayerService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,5 +30,9 @@ public class PlayerController {
         playerService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId());
         List<Player> updatedPlayers = playerService.getAllPlayers();
         return new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
+    }
+    @PostMapping("/action")
+    public void performAction(@RequestBody ActionRequest actionRequest){
+        playerService.performAction(actionRequest.getPlayer(), actionRequest.getAction(), actionRequest.getTargetPlayer());
     }
 }
