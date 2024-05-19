@@ -9,6 +9,4 @@ public class AmongUsApplication {
     public static void main(String[] args) {
         SpringApplication.run(AmongUsApplication.class, args);
     }
-
-
 }

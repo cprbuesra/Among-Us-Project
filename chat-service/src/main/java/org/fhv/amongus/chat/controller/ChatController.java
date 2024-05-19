@@ -19,7 +19,7 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    @MessageMapping("/chat/{roomId}/sendMessage")
+    /*@MessageMapping("/chat/{roomId}/sendMessage")
     @SendTo("/topic/{roomId}")
     public ChatMessageDTO sendMessage(@Payload ChatMessage chatMessage, @DestinationVariable String roomId) {
         return chatService.saveMessage(chatMessage, roomId);
@@ -30,5 +30,5 @@ public class ChatController {
     public ChatMessageDTO addUser(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor, @DestinationVariable String roomId) {
         headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
         return chatService.saveMessage(chatMessage, roomId);
-    }
+    }*/
 }

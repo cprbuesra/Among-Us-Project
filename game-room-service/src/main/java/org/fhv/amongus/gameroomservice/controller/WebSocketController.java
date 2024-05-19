@@ -17,7 +17,7 @@ public class WebSocketController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final GameRoomService gameRoomService;
-    private SimpMessagingTemplate simpMessagingTemplate;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
 
     @MessageMapping("/startGame")

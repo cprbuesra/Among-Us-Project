@@ -19,14 +19,16 @@ public class GameRoom {
     @GeneratedValue
     private Long id;
     private String name;
-    @ElementCollection
-    private List<PlayerInfo> players;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "game_room_players", joinColumns = @JoinColumn(name = "game_room_id"))
+    private List<PlayerInfo> players = new ArrayList<>();
+
     private boolean started = false;
     private String createdBy;
 
-   public GameRoom(String name, String sessionId) {
+    public GameRoom(String name, String sessionId) {
         this.name = name;
         this.createdBy = sessionId;
-        this.players = new ArrayList<>();
     }
 }

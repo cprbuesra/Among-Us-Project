@@ -82,12 +82,16 @@ public class GameRoomRepositoryService {
         return GameRoomMapper.toDTO(gameRoom);
     }
 
+    @Transactional
     public GameRoomDTO startGame(Long roomId) {
         GameRoom gameRoom = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
 
-        gameRoom.setStarted(true);
+        for (PlayerInfo player : gameRoom.getPlayers()) {
+            System.out.println();
+        }
 
+        gameRoom.setStarted(true);
         GameRoom updatedRoom = gameRoomRepository.save(gameRoom);
 
         return GameRoomMapper.toDTO(updatedRoom);
