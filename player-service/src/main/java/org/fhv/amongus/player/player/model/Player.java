@@ -41,6 +41,9 @@ public class Player implements UserDetails {
             }
         }
     }
+    public boolean wouldCollideWith(Player otherPlayer, int newX, int newY) {
+        return otherPlayer.x == newX && otherPlayer.y == newY;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

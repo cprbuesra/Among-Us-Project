@@ -3,9 +3,11 @@ package org.fhv.amongus.movementservice.service;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.movementservice.DTO.PlayerPosition;
 import org.fhv.amongus.movementservice.DTO.PlayerMove;
+import org.fhv.amongus.player.player.model.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -13,6 +15,7 @@ public class MovementService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final BoundaryService boundaryService;
+    private final PlayerServiceClient playerServiceClient;
     final int SHIP_WIDTH = 2160;
     final int SHIP_HEIGHT = 1160;
 
@@ -48,6 +51,13 @@ public class MovementService {
         PlayerPosition playerPosition = new PlayerPosition();
 
         if (boundaryService.isWithinMovementBoundaries(absoluteX, absoluteY)) {
+            Player player = playerServiceClient.findPlayerById(move.getPlayerId());
+            List<Player> otherPlayers = playerServiceClient.findAllOtherPlayers(move.getPlayerId());
+            for(Player otherPlayer : otherPlayers){
+                if(player.wouldCollideWith(otherPlayer, newX, newY)){
+                    throw new Exception("Player would collide with another player");
+                }
+            }
             playerPosition.setPlayerId(move.getPlayerId());
             playerPosition.setNewPositionX(newX);
             playerPosition.setNewPositionY(newY);

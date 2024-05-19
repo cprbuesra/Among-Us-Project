@@ -25,6 +25,7 @@ import static org.fhv.amongus.player.player.model.Action.KILL;
 
 @Service
 @RequiredArgsConstructor
+
 public class PlayerService {
 
     private final PlayerRepositoryService playerRepositoryService;
@@ -89,14 +90,22 @@ public class PlayerService {
 
     }
     public void performAction(Player player, Action action, Player targetPlayer){
+        validatePlayer(player);
         switch (action){
             case KILL:
                 player.eliminatePlayer(targetPlayer, action);
                 break;
         }
     }
+    public void validatePlayer(Player player){
+        if(!playerRepository.existsById(player.getPlayerId())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player not found");
+        }
+    }
 
     public List<Player> getAllPlayers() {
         return playerRepository.findAll();
     }
+
 }
+
