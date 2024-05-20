@@ -96,6 +96,7 @@ public class PlayerService {
                 player.eliminatePlayer(targetPlayer, action);
                 break;
         }
+        //other action cases
     }
     public void validatePlayer(Player player){
         if(!playerRepository.existsById(player.getPlayerId())){
