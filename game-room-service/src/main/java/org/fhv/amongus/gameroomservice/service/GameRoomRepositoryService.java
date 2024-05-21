@@ -96,4 +96,14 @@ public class GameRoomRepositoryService {
 
         return GameRoomMapper.toDTO(updatedRoom);
     }
+
+    public GameRoom findById(Long roomId) {
+        return gameRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+    }
+
+    public GameRoom save(GameRoom gameRoom) {
+        return gameRoomRepository.save(gameRoom);
+    }
+
 }

@@ -25,6 +25,7 @@ public class Player implements UserDetails {
     private boolean flip;
     private Role role;
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

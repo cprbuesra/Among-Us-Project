@@ -28,9 +28,19 @@ public class PlayerController {
     }
 
     @PostMapping("/assignRoles")
-    public AssignRolesDTO assignAndFetchRoles(@RequestBody AssignRoles assignRoles) throws Exception {
-        playerService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId());
-        List<Player> updatedPlayers = playerService.getAllPlayers();
-        return new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
+    public ResponseEntity<AssignRolesDTO> assignAndFetchRoles(@RequestBody AssignRoles assignRoles) throws Exception {
+        playerService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId(), assignRoles.getRoomId());
+        List<Player> updatedPlayers = playerService.getPlayersByRoomId(assignRoles.getRoomId());
+        AssignRolesDTO assignRolesDTO = new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
+        return ResponseEntity.ok(assignRolesDTO);
     }
+
+    @PostMapping("/updatePlayerRoles")
+    public ResponseEntity<AssignRolesDTO> assignAndFetchRoles(@RequestBody AssignRoles assignRoles) throws Exception {
+        playerService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId(), assignRoles.getRoomId());
+        List<Player> updatedPlayers = playerService.getPlayersByRoomId(assignRoles.getRoomId());
+        AssignRolesDTO assignRolesDTO = new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
+        return ResponseEntity.ok(assignRolesDTO);
+    }
+
 }

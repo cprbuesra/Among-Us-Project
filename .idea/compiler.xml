@@ -14,11 +14,14 @@
         <module name="AmongUs" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="chat" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="AmongUs" options="-parameters" />
-      <module name="chat-service" options="-parameters" />
+      <module name="chat-service" options="" />
       <module name="game-room-service" options="-parameters" />
       <module name="movement-service" options="-parameters" />
       <module name="player-service" options="-parameters" />
