@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.DTO.PlayerDTO;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
+import org.fhv.amongus.gameroomservice.model.Player;
 import org.fhv.amongus.gameroomservice.model.PlayerInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +61,7 @@ public class GameRoomService {
             return;
         }
 
-        List<PlayerInfo> players = gameRoom.getPlayers();
+        List<Player> players = gameRoom.getPlayers();
 
         HttpClient client = HttpClient.newBuilder().build();
 
@@ -68,7 +69,7 @@ public class GameRoomService {
         String json = objectMapper.writeValueAsString(players);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("localhost:8080/api/player/assignRoles"))
+                .uri(URI.create("localhost:8080/api/player/updatePlayerRoles"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();

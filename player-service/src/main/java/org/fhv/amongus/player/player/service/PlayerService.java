@@ -72,10 +72,19 @@ public class PlayerService {
     }
 
 
-    public void updateRole(){
+    public void updateRoles(List<Player> players){
+        Collections.shuffle(players);
 
-
-
+        int totalPlayers = players.size();
+        int numberOfImpostors = Math.max(1, totalPlayers / 3);
+        for (int i = 0; i < totalPlayers; i++) {
+            if (i < numberOfImpostors) {
+                players.get(i).setRole(Role.IMPOSTER);
+            } else {
+                players.get(i).setRole(Role.CREWMATE);
+            }
+            playerRepository.save(players.get(i));
+        }
     }
 
 

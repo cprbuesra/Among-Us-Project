@@ -3,8 +3,6 @@ package org.fhv.amongus.player.player.controller;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.player.jwt.DTO.AuthRequest;
 import org.fhv.amongus.player.jwt.DTO.AuthResponse;
-import org.fhv.amongus.player.player.DTO.AssignRoles;
-import org.fhv.amongus.player.player.DTO.AssignRolesDTO;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.service.PlayerService;
 import org.springframework.http.ResponseEntity;
@@ -27,20 +25,11 @@ public class PlayerController {
         return ResponseEntity.ok(playerService.savePlayer(registerRequest));
     }
 
-    @PostMapping("/assignRoles")
-    public ResponseEntity<AssignRolesDTO> assignAndFetchRoles(@RequestBody AssignRoles assignRoles) throws Exception {
-        playerService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId(), assignRoles.getRoomId());
-        List<Player> updatedPlayers = playerService.getPlayersByRoomId(assignRoles.getRoomId());
-        AssignRolesDTO assignRolesDTO = new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
-        return ResponseEntity.ok(assignRolesDTO);
-    }
+
 
     @PostMapping("/updatePlayerRoles")
-    public ResponseEntity<AssignRolesDTO> assignAndFetchRoles(@RequestBody AssignRoles assignRoles) throws Exception {
-        playerService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId(), assignRoles.getRoomId());
-        List<Player> updatedPlayers = playerService.getPlayersByRoomId(assignRoles.getRoomId());
-        AssignRolesDTO assignRolesDTO = new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
-        return ResponseEntity.ok(assignRolesDTO);
+    public void assignAndFetchRoles(@RequestBody List<Player> players) throws Exception {
+        playerService.updateRoles(players);
     }
 
 }

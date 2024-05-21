@@ -3,6 +3,7 @@ package org.fhv.amongus.gameroomservice;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.DTO.PlayerDTO;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
+import org.fhv.amongus.gameroomservice.model.Player;
 import org.fhv.amongus.gameroomservice.model.PlayerInfo;
 
 import java.util.List;
@@ -33,8 +34,8 @@ public class GameRoomMapper {
         if (gameRoomDTO == null) {
             return null;
         }
-        List<PlayerInfo> playerInfos = gameRoomDTO.getPlayers().stream()
-                .map(dto -> new PlayerInfo(dto.getPlayerId(), dto.getUsername()))
+        List<Player> players = gameRoomDTO.getPlayers().stream()
+                .map(dto -> Player.builder().playerId(dto.getPlayerId()).username(dto.getUsername()).build())
                 .collect(Collectors.toList());
 
         GameRoom gameRoom = new GameRoom(
@@ -43,7 +44,7 @@ public class GameRoomMapper {
         );
         gameRoom.setId(gameRoomDTO.getId());
         gameRoom.setStarted(gameRoomDTO.isStarted());
-        gameRoom.setPlayers(playerInfos);
+        gameRoom.setPlayers(players);
 
         return gameRoom;
     }

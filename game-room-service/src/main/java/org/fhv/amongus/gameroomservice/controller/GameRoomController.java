@@ -2,12 +2,12 @@ package org.fhv.amongus.gameroomservice.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.fhv.amongus.gameroomservice.DTO.CreateRoomRequest;
-import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
-import org.fhv.amongus.gameroomservice.DTO.RoomRequest;
+import org.fhv.amongus.gameroomservice.DTO.*;
+import org.fhv.amongus.gameroomservice.model.Player;
 import org.fhv.amongus.gameroomservice.service.GameRoomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -80,6 +80,13 @@ public class GameRoomController {
         return gameRoomService.leaveGameRoom(roomRequest.getRoomId(), roomRequest.getPlayerId(), roomRequest.getUsername());
     }
 
+    @PostMapping("/assignRoles")
+    public ResponseEntity<AssignRolesDTO> assignAndFetchRoles(@RequestBody AssignRoles assignRoles) throws Exception {
+        gameRoomService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId(), assignRoles.getRoomId());
+        List<Player> updatedPlayers = gameRoomService.getPlayersByRoomId(assignRoles.getRoomId());
+        AssignRolesDTO assignRolesDTO = new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
+        return ResponseEntity.ok(assignRolesDTO);
+    }
 
 
 }
