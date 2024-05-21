@@ -82,14 +82,19 @@ public class PlayerController {
     }
     @PostMapping("/eliminate")
     public ResponseEntity<Void> eliminatePlayer(@RequestBody EliminationRequest eliminationRequest) {
+        System.out.println(eliminationRequest.getPlayerId() + " " + eliminationRequest.getTargetPlayerId() + " " + eliminationRequest.getAction());
         try {
             Player player = playerService.getPlayerById(eliminationRequest.getPlayerId());
             Player targetPlayer = playerService.getPlayerById(eliminationRequest.getTargetPlayerId());
             playerService.eliminatePlayer(player, targetPlayer, eliminationRequest.getAction());
+            System.out.println("Eliminated");
             return ResponseEntity.ok().build();
         } catch (ResponseStatusException e) {
+            System.out.printf("Error %s", e.getMessage());
+            System.out.println("Error");
             return ResponseEntity.status(e.getStatusCode()).build();
         } catch (Exception e) {
+            System.out.println("Error2");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
