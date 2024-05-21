@@ -80,4 +80,17 @@ public class PlayerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
         }
     }
+    @PostMapping("/eliminate")
+    public ResponseEntity<Void> eliminatePlayer(@RequestBody EliminationRequest eliminationRequest) {
+        try {
+            Player player = playerService.getPlayerById(eliminationRequest.getPlayerId());
+            Player targetPlayer = playerService.getPlayerById(eliminationRequest.getTargetPlayerId());
+            playerService.eliminatePlayer(player, targetPlayer, eliminationRequest.getAction());
+            return ResponseEntity.ok().build();
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
