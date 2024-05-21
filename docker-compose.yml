@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - amongUs-network
+
+  chat-service:
+    build:
+      context: ./chat-service
+    ports:
+      - "8083:8080"
+    networks:
+      - amongUs-network
+    depends_on:
+      - rabbitmq
+
+  game-room-service:
+    build:
+      context: ./game-room-service
+    ports:
+      - "8081:8080"
+    networks:
+      - amongUs-network
+    depends_on:
+      - rabbitmq
+
+  movement-service:
+    build:
+      context: ./movement-service
+    ports:
+      - "8082:8080"
+    networks:
+      - amongUs-network
+    depends_on:
+      - rabbitmq
+
+  player-service:
+    build:
+      context: ./player-service
+    ports:
+      - "8084:8080"
+    networks:
+      - amongUs-network
+    depends_on:
+      - rabbitmq
+
+networks:
+  amongUs-network:
+    driver: bridge

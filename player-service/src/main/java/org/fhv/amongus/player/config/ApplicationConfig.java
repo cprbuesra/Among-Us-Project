@@ -27,6 +27,4 @@ public class ApplicationConfig {
         authenticationProvider.setUserDetailsService(userDetailsService());
         return authenticationProvider;
     }
-
-
 }
