@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Service
 public class PlayerServiceClient {
-    private final String playerServiceUrl = "http://localhost:8080"; // Replace with the actual URL of the PlayerService microservice
+    private final String playerServiceUrl = "http://localhost:8080"; // Replace with the actual URL (8084) of the PlayerService microservice
     private final RestTemplate restTemplate;
 
     public PlayerServiceClient(RestTemplate restTemplate) {

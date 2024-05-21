@@ -9,10 +9,15 @@ import org.fhv.amongus.movementservice.service.MovementMessageSender;
 import org.fhv.amongus.movementservice.service.MovementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -54,6 +59,18 @@ public class MovementController {
         simpMessagingTemplate.convertAndSend("/topic/moveEnd/" + roomId, "{\"sessionId\": \"" + sessionId + "\"}");
     }
 
+    @PostMapping("/checkNearPlayer")
+    public ResponseEntity<Boolean> checkNearPlayer(@RequestBody PlayerMove move) {
+        try {
+            boolean isNear = movementService.movePlayer(move).isFlip();
+            String topic = "/topic/nearPlayer/" + move.getRoomId();
+            simpMessagingTemplate.convertAndSend(topic, isNear);
+            return ResponseEntity.ok(isNear);
+        } catch (Exception e) {
+            logger.error("Error checking near player", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+    }
     /*
     @MessageMapping("/leave")
     @SendTo("/topic/leave")

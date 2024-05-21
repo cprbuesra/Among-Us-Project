@@ -53,8 +53,8 @@ public class MovementService {
         if (boundaryService.isWithinMovementBoundaries(absoluteX, absoluteY)) {
             Player player = playerServiceClient.findPlayerById(move.getPlayerId());
             List<Player> otherPlayers = playerServiceClient.findAllOtherPlayers(move.getPlayerId());
-            for(Player otherPlayer : otherPlayers){
-                if(player.wouldCollideWith(otherPlayer, newX, newY)){
+            for (Player otherPlayer : otherPlayers){
+                if (player.wouldCollideWith(otherPlayer, newX, newY)){
                     throw new Exception("Player would collide with another player");
                 }
             }

@@ -20,30 +20,15 @@ public class Player implements UserDetails {
     @GeneratedValue
     private Long playerId;
     private String username;
+    @Getter
     private int x;
+    @Getter
     private int y;
     private boolean flip;
     @Setter
     private Role role;
-    private static final double NEAR_DISTANCE = 1.5;
+    public static final double NEAR_DISTANCE = 1.5;
 
-    private double calculateDistance(Player otherPlayer){
-        int xDistance = Math.abs(this.x - otherPlayer.getX());
-        int yDistance = Math.abs(this.y - otherPlayer.getY());
-        return Math.sqrt((xDistance * xDistance + yDistance * yDistance));
-    }
-
-    public void eliminatePlayer(Player otherPlayer, Action action){
-        if (action == Action.KILL && this.role == Role.IMPOSTER){
-            double distance = calculateDistance(otherPlayer);
-            if (distance <= NEAR_DISTANCE){
-                otherPlayer.setRole(Role.GHOST);
-            }
-        }
-    }
-    public boolean wouldCollideWith(Player otherPlayer, int newX, int newY) {
-        return otherPlayer.x == newX && otherPlayer.y == newY;
-    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -77,5 +62,24 @@ public class Player implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public double calculateDistance(Player otherPlayer) {
+        int xDistance = Math.abs(this.x - otherPlayer.getX());
+        int yDistance = Math.abs(this.y - otherPlayer.getY());
+        return Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+    }
+
+    public void eliminatePlayer(Player otherPlayer, Action action) {
+        if (action == Action.KILL && this.role == Role.IMPOSTER) {
+            double distance = calculateDistance(otherPlayer);
+            if (distance <= NEAR_DISTANCE) {
+                otherPlayer.setRole(Role.GHOST);
+            }
+        }
+    }
+
+    public boolean wouldCollideWith(Player otherPlayer, int newX, int newY) {
+        return otherPlayer.getX() == newX && otherPlayer.getY() == newY;
     }
 }

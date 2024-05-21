@@ -21,11 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.fhv.amongus.player.player.model.Action.KILL;
-
 @Service
 @RequiredArgsConstructor
-
 public class PlayerService {
 
     private final PlayerRepositoryService playerRepositoryService;
@@ -33,7 +30,6 @@ public class PlayerService {
     private final JwtTokenRepositoryService jwtTokenRepositoryService;
     private final PlayerRepository playerRepository;
     private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
-
 
     public AuthResponse savePlayer(AuthRequest authRequest) {
         Optional<Player> existingPlayer = playerRepositoryService.findByUsername(authRequest.getUsername());
@@ -49,7 +45,6 @@ public class PlayerService {
                     .flip(false)
                     .build();
             playerRepositoryService.savePlayer(player);
-
 
             var jwtToken = jwtTokenService.generateToken(player);
             logger.info("Generated JWT Token: {}", jwtToken);
@@ -87,26 +82,44 @@ public class PlayerService {
             players.get(i).setRole(i < numberOfImpostors ? Role.IMPOSTER : Role.CREWMATE);
             playerRepository.save(players.get(i));
         }
+    }
 
-    }
-    public void performAction(Player player, Action action, Player targetPlayer){
+    public void performAction(Player player, Action action, Player targetPlayer) {
         validatePlayer(player);
-        switch (action){
+        switch (action) {
             case KILL:
-                player.eliminatePlayer(targetPlayer, action);
+                eliminatePlayer(player, targetPlayer, action);
                 break;
+            // other action cases
         }
-        //other action cases
     }
-    public void validatePlayer(Player player){
-        if(!playerRepository.existsById(player.getPlayerId())){
+
+    public void validatePlayer(Player player) {
+        if (!playerRepository.existsById(player.getPlayerId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player not found");
         }
+    }
+
+    public Player getPlayerById(Long playerId) {
+        return playerRepository.findById(playerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
     }
 
     public List<Player> getAllPlayers() {
         return playerRepository.findAll();
     }
 
-}
+    public double calculateDistance(Player player, Player otherPlayer) {
+        int xDistance = Math.abs(player.getX() - otherPlayer.getX());
+        int yDistance = Math.abs(player.getY() - otherPlayer.getY());
+        return Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+    }
 
+    public void eliminatePlayer(Player player, Player otherPlayer, Action action) {
+        player.eliminatePlayer(otherPlayer, action);
+    }
+
+    public boolean wouldCollideWith(Player player, Player otherPlayer, int newX, int newY) {
+        return otherPlayer.getX() == newX && otherPlayer.getY() == newY;
+    }
+}
