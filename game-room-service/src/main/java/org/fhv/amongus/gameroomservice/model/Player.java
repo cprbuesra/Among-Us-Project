@@ -1,4 +1,4 @@
-package org.fhv.amongus.player.player.model;
+package org.fhv.amongus.gameroomservice.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,12 +8,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "player")
 public class Player implements UserDetails {
 
     @Id
@@ -61,3 +60,4 @@ public class Player implements UserDetails {
         return true;
     }
 }
+

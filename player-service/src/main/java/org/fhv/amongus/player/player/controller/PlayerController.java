@@ -3,8 +3,6 @@ package org.fhv.amongus.player.player.controller;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.player.jwt.DTO.AuthRequest;
 import org.fhv.amongus.player.jwt.DTO.AuthResponse;
-import org.fhv.amongus.player.player.DTO.AssignRoles;
-import org.fhv.amongus.player.player.DTO.AssignRolesDTO;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.service.PlayerService;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +25,11 @@ public class PlayerController {
         return ResponseEntity.ok(playerService.savePlayer(registerRequest));
     }
 
-    @PostMapping("/assignRoles")
-    public AssignRolesDTO assignAndFetchRoles(@RequestBody AssignRoles assignRoles) throws Exception {
-        playerService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId());
-        List<Player> updatedPlayers = playerService.getAllPlayers();
-        return new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
+
+
+    @PostMapping("/updatePlayerRoles")
+    public void assignAndFetchRoles(@RequestBody List<Player> players) throws Exception {
+        playerService.updateRoles(players);
     }
+
 }

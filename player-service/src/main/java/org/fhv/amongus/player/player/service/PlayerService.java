@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
@@ -70,23 +71,22 @@ public class PlayerService {
         }
     }
 
-    public void assignRolesToPlayers(String token, String sessionId) throws Exception {
-        String username = jwtTokenService.extractUsername(token);
-        JwtToken jwtToken = jwtTokenService.findByTokenAndSession(token, sessionId)
-                .orElseThrow(() -> new Exception("Token not found"));
 
-        List<Player> players = playerRepository.findAll();
+    public void updateRoles(List<Player> players){
         Collections.shuffle(players);
-        int numberOfImpostors = Math.max(1, players.size() / 4);
 
-        for (int i = 0; i < players.size(); i++) {
-            players.get(i).setRole(i < numberOfImpostors ? Role.IMPOSTER : Role.CREWMATE);
+        int totalPlayers = players.size();
+        int numberOfImpostors = Math.max(1, totalPlayers / 3);
+        for (int i = 0; i < totalPlayers; i++) {
+            if (i < numberOfImpostors) {
+                players.get(i).setRole(Role.IMPOSTER);
+            } else {
+                players.get(i).setRole(Role.CREWMATE);
+            }
             playerRepository.save(players.get(i));
         }
-
     }
 
-    public List<Player> getAllPlayers() {
-        return playerRepository.findAll();
-    }
+
+
 }

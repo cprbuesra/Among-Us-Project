@@ -22,7 +22,7 @@ public class GameRoom {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "game_room_players", joinColumns = @JoinColumn(name = "game_room_id"))
-    private List<PlayerInfo> players = new ArrayList<>();
+    private List<Player> players = new ArrayList<>();
 
     private boolean started = false;
     private String createdBy;

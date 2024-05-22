@@ -1,9 +1,20 @@
 package org.fhv.amongus.gameroomservice.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
+import org.fhv.amongus.gameroomservice.DTO.PlayerDTO;
+import org.fhv.amongus.gameroomservice.model.GameRoom;
+import org.fhv.amongus.gameroomservice.model.Player;
+import org.fhv.amongus.gameroomservice.model.PlayerInfo;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -38,5 +49,39 @@ public class GameRoomService {
 
     public GameRoomDTO startGame(Long roomId) {
         return gameRoomRepositoryService.startGame(roomId);
+    }
+
+
+    @Transactional
+    public void assignRolesToPlayers(String token, String sessionId, Long roomId) throws Exception {
+
+        GameRoom gameRoom = gameRoomRepositoryService.findById(roomId);
+
+        if (gameRoom.isStarted()) {
+            return;
+        }
+
+        List<Player> players = gameRoom.getPlayers();
+
+        HttpClient client = HttpClient.newBuilder().build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(players);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("localhost:8080/api/player/updatePlayerRoles"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        gameRoom.setStarted(true);
+        gameRoomRepositoryService.save(gameRoom);
+    }
+
+
+    public List<Player> getPlayersByRoomId(Long roomId) {
+        GameRoom gameRoom = gameRoomRepositoryService.findById(roomId);
+        return gameRoom.getPlayers();
     }
 }

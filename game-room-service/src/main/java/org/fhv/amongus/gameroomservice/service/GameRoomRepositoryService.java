@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.GameRoomMapper;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
+import org.fhv.amongus.gameroomservice.model.Player;
 import org.fhv.amongus.gameroomservice.model.PlayerInfo;
 import org.fhv.amongus.gameroomservice.repository.GameRoomRepository;
 import org.slf4j.Logger;
@@ -38,8 +39,9 @@ public class GameRoomRepositoryService {
         GameRoom gameRoom = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
 
-        PlayerInfo playerInfo = new PlayerInfo(playerId, username);
-        gameRoom.getPlayers().add(playerInfo);
+        //PlayerInfo playerInfo = new PlayerInfo(playerId, username);
+        Player player = Player.builder().playerId(playerId).username(username).build();
+        gameRoom.getPlayers().add(player);
         gameRoomRepository.save(gameRoom);
 
         //TODO: Notify Player Service that player has joined the game room
@@ -87,7 +89,7 @@ public class GameRoomRepositoryService {
         GameRoom gameRoom = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
 
-        for (PlayerInfo player : gameRoom.getPlayers()) {
+        for (Player player : gameRoom.getPlayers()) {
             System.out.println();
         }
 
@@ -96,4 +98,14 @@ public class GameRoomRepositoryService {
 
         return GameRoomMapper.toDTO(updatedRoom);
     }
+
+    public GameRoom findById(Long roomId) {
+        return gameRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+    }
+
+    public GameRoom save(GameRoom gameRoom) {
+        return gameRoomRepository.save(gameRoom);
+    }
+
 }
