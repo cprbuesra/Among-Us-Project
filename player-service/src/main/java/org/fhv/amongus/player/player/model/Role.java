@@ -1,5 +1,5 @@
 package org.fhv.amongus.player.player.model;
 
 public enum Role {
-    IMPOSTER, CREWMATE
+    IMPOSTER, CREWMATE, GHOST
 }

@@ -6,6 +6,7 @@ import org.fhv.amongus.player.jwt.DTO.AuthResponse;
 import org.fhv.amongus.player.jwt.model.JwtToken;
 import org.fhv.amongus.player.jwt.service.JwtTokenRepositoryService;
 import org.fhv.amongus.player.jwt.service.JwtTokenService;
+import org.fhv.amongus.player.player.model.Action;
 import org.fhv.amongus.player.player.DTO.PlayerInfo;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.model.Role;
@@ -29,7 +30,6 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
     private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
 
-
     public AuthResponse savePlayer(AuthRequest authRequest) {
         Optional<Player> existingPlayer = playerRepositoryService.findByUsername(authRequest.getUsername());
         if (existingPlayer.isPresent()) {
@@ -44,7 +44,6 @@ public class PlayerService {
                     .flip(false)
                     .build();
             playerRepositoryService.savePlayer(player);
-
 
             var jwtToken = jwtTokenService.generateToken(player);
             logger.info("Generated JWT Token: {}", jwtToken);
@@ -96,5 +95,43 @@ public class PlayerService {
     }
 
 
+    public void performAction(Player player, Action action, Player targetPlayer) {
+        validatePlayer(player);
+        switch (action) {
+            case KILL:
+                eliminatePlayer(player, targetPlayer, action);
+                break;
+            // other action cases
+        }
+    }
 
+    public void validatePlayer(Player player) {
+        if (!playerRepository.existsById(player.getPlayerId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player not found");
+        }
+    }
+
+    public Player getPlayerById(Long playerId) {
+        return playerRepository.findById(playerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
+    }
+
+
+    public List<Player> getAllPlayers() {
+        return playerRepository.findAll();
+    }
+
+    public double calculateDistance(Player player, Player otherPlayer) {
+        int xDistance = Math.abs(player.getX() - otherPlayer.getX());
+        int yDistance = Math.abs(player.getY() - otherPlayer.getY());
+        return Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+    }
+
+    public void eliminatePlayer(Player player, Player otherPlayer, Action action) {
+        player.eliminatePlayer(otherPlayer, action);
+    }
+
+    public boolean wouldCollideWith(Player player, Player otherPlayer, int newX, int newY) {
+        return otherPlayer.getX() == newX && otherPlayer.getY() == newY;
+    }
 }
