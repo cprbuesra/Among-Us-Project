@@ -10,54 +10,19 @@ import java.util.List;
 
 
 @Data
-@Builder
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class Player implements UserDetails {
+@Embeddable
+public class Player {
 
-    @Id
-    @GeneratedValue
     private Long playerId;
     private String username;
-    private int x;
-    private int y;
-    private boolean flip;
-    private Role role;
+    private String role;
 
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    @Override
-    public String getPassword() {
-        return "";
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public Player(Long playerId, String username) {
+        this.playerId = playerId;
+        this.username = username;
     }
 }
 

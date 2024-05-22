@@ -1,4 +1,4 @@
-package org.fhv.amongus.player.player.DTO;
+package org.fhv.amongus.gameroomservice.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerInfo {
-
-    private Long playerId;
-    private String username;
+public class JoinRoomDTO {
+    private String sessionId;
     private String role;
+    private String username;
 }

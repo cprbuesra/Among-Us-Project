@@ -39,8 +39,7 @@ public class GameRoomRepositoryService {
         GameRoom gameRoom = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
 
-        //PlayerInfo playerInfo = new PlayerInfo(playerId, username);
-        Player player = Player.builder().playerId(playerId).username(username).build();
+        Player player = new Player(playerId, username);
         gameRoom.getPlayers().add(player);
         gameRoomRepository.save(gameRoom);
 
@@ -108,4 +107,7 @@ public class GameRoomRepositoryService {
         return gameRoomRepository.save(gameRoom);
     }
 
+    public String getRole(String username) {
+        return gameRoomRepository.getRoleByUsername(username);
+    }
 }

@@ -22,7 +22,7 @@ public class GameRoomController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final GameRoomService gameRoomService;
-    private SimpMessagingTemplate simpMessagingTemplate;
+
 
     @PostMapping("/createGameRoom")
     public GameRoomDTO createGameRoom(@RequestBody CreateRoomRequest createRoomRequest) throws Exception {
@@ -80,11 +80,14 @@ public class GameRoomController {
         return gameRoomService.leaveGameRoom(roomRequest.getRoomId(), roomRequest.getPlayerId(), roomRequest.getUsername());
     }
 
-    @PostMapping("/assignRoles")
-    public ResponseEntity<AssignRolesDTO> assignAndFetchRoles(@RequestBody AssignRoles assignRoles) throws Exception {
-        gameRoomService.assignRolesToPlayers(assignRoles.getToken(), assignRoles.getSessionId(), assignRoles.getRoomId());
-        List<Player> updatedPlayers = gameRoomService.getPlayersByRoomId(assignRoles.getRoomId());
-        AssignRolesDTO assignRolesDTO = new AssignRolesDTO(assignRoles.getSessionId(), updatedPlayers);
+    @PostMapping("/assignRoles/{roomId}")
+    public ResponseEntity<AssignRolesDTO> assignAndFetchRoles(@PathVariable String roomId) throws Exception {
+        logger.info("Assigning roles to players in room: {}", roomId);
+        Long roomIdLong = Long.parseLong(roomId);
+        gameRoomService.assignRolesToPlayers(roomIdLong);
+        List<Player> updatedPlayers = gameRoomService.getPlayersByRoomId(roomIdLong);
+        AssignRolesDTO assignRolesDTO = new AssignRolesDTO(updatedPlayers);
+        logger.info("Roles assigned to players in room: {}", roomId);
         return ResponseEntity.ok(assignRolesDTO);
     }
 

@@ -1,5 +1,6 @@
 package org.fhv.amongus.gameroomservice.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
@@ -7,6 +8,8 @@ import org.fhv.amongus.gameroomservice.DTO.PlayerDTO;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
 import org.fhv.amongus.gameroomservice.model.Player;
 import org.fhv.amongus.gameroomservice.model.PlayerInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class GameRoomService {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final GameRoomRepositoryService gameRoomRepositoryService;
 
@@ -53,13 +58,10 @@ public class GameRoomService {
 
 
     @Transactional
-    public void assignRolesToPlayers(String token, String sessionId, Long roomId) throws Exception {
+    public void assignRolesToPlayers(Long roomId) throws Exception {
 
         GameRoom gameRoom = gameRoomRepositoryService.findById(roomId);
 
-        if (gameRoom.isStarted()) {
-            return;
-        }
 
         List<Player> players = gameRoom.getPlayers();
 
@@ -69,13 +71,20 @@ public class GameRoomService {
         String json = objectMapper.writeValueAsString(players);
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("localhost:8080/api/player/updatePlayerRoles"))
+                .uri(URI.create("http://localhost:8084/api/player/updatePlayerRoles"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
+        logger.info("Response code: {}", response.body());
+
+        List<Player> updatedPlayers = objectMapper.readValue(response.body(), new TypeReference<List<Player>>(){});
+
+        logger.info("Updated players: {}", updatedPlayers);
+
         gameRoom.setStarted(true);
+        gameRoom.setPlayers(updatedPlayers);
         gameRoomRepositoryService.save(gameRoom);
     }
 
@@ -83,5 +92,9 @@ public class GameRoomService {
     public List<Player> getPlayersByRoomId(Long roomId) {
         GameRoom gameRoom = gameRoomRepositoryService.findById(roomId);
         return gameRoom.getPlayers();
+    }
+
+    public String getRole(String username) {
+        return gameRoomRepositoryService.getRole(username);
     }
 }

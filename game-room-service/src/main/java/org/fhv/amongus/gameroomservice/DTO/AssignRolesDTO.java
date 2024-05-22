@@ -13,7 +13,5 @@ import lombok.Data;
 
 public class AssignRolesDTO{
 
-        private String sessionId;
         List<Player> players;
-
 }

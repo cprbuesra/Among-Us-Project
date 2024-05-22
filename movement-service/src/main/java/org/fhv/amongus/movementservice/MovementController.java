@@ -54,6 +54,8 @@ public class MovementController {
         simpMessagingTemplate.convertAndSend("/topic/moveEnd/" + roomId, "{\"sessionId\": \"" + sessionId + "\"}");
     }
 
+
+
     /*
     @MessageMapping("/leave")
     @SendTo("/topic/leave")

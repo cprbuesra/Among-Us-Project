@@ -6,6 +6,7 @@ import org.fhv.amongus.player.jwt.DTO.AuthResponse;
 import org.fhv.amongus.player.jwt.model.JwtToken;
 import org.fhv.amongus.player.jwt.service.JwtTokenRepositoryService;
 import org.fhv.amongus.player.jwt.service.JwtTokenService;
+import org.fhv.amongus.player.player.DTO.PlayerInfo;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.model.Role;
 import org.fhv.amongus.player.player.repository.PlayerRepository;
@@ -16,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -72,11 +70,12 @@ public class PlayerService {
     }
 
 
-    public void updateRoles(List<Player> players){
+    public List<PlayerInfo> updateRoles(List<Player> players){
         Collections.shuffle(players);
 
         int totalPlayers = players.size();
         int numberOfImpostors = Math.max(1, totalPlayers / 3);
+        List<PlayerInfo> playerInfos = new ArrayList<>();
         for (int i = 0; i < totalPlayers; i++) {
             if (i < numberOfImpostors) {
                 players.get(i).setRole(Role.IMPOSTER);
@@ -84,7 +83,16 @@ public class PlayerService {
                 players.get(i).setRole(Role.CREWMATE);
             }
             playerRepository.save(players.get(i));
+
+            PlayerInfo playerInfo = new PlayerInfo();
+            playerInfo.setPlayerId(players.get(i).getPlayerId());
+            playerInfo.setUsername(players.get(i).getUsername());
+            playerInfo.setRole(String.valueOf(players.get(i).getRole()));
+
+
+            playerInfos.add(playerInfo);
         }
+        return playerInfos;
     }
 
 
