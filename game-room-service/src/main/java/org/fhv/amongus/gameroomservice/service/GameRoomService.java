@@ -62,6 +62,9 @@ public class GameRoomService {
 
         GameRoom gameRoom = gameRoomRepositoryService.findById(roomId);
 
+        if( gameRoom.isStarted()){
+            return;
+        }
 
         List<Player> players = gameRoom.getPlayers();
 
