@@ -86,6 +86,7 @@ public class GameRoomController {
         Long roomIdLong = Long.parseLong(roomId);
         gameRoomService.assignRolesToPlayers(roomIdLong);
         List<Player> updatedPlayers = gameRoomService.getPlayersByRoomId(roomIdLong);
+        logger.info("These are the updated players: {}", updatedPlayers);
         AssignRolesDTO assignRolesDTO = new AssignRolesDTO(updatedPlayers);
         logger.info("Roles assigned to players in room: {}", roomId);
         return ResponseEntity.ok(assignRolesDTO);

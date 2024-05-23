@@ -75,6 +75,7 @@ public class GameRoomService {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
+
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
         logger.info("Response code: {}", response.body());

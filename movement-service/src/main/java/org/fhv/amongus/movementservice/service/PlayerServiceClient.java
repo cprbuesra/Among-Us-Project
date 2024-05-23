@@ -1,5 +1,6 @@
 package org.fhv.amongus.movementservice.service;
 
+import org.fhv.amongus.player.player.DTO.CollisionRequest;
 import org.fhv.amongus.player.player.model.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class PlayerServiceClient {
@@ -36,15 +35,17 @@ public class PlayerServiceClient {
     }
 
 
-
     public List<Player> findAllOtherPlayers(Long playerId) {
-        String url = String.format("%s/api/player/getAllPlayers", playerServiceUrl);
+        String url = String.format("%s/api/player/getAllPlayers/%d", playerServiceUrl, playerId);
         logger.info("Requesting URL: {}", url);
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         ResponseEntity<List<Player>> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
-                null,
+                entity,
                 new ParameterizedTypeReference<List<Player>>() {}
         );
 
@@ -52,4 +53,35 @@ public class PlayerServiceClient {
         logger.info("Other players data: {}", players);
         return players;
     }
+
+    public boolean wouldCollideWith(Long playerId, Long otherPlayerId) {
+        String url = String.format("%s/api/player/wouldCollideWith", playerServiceUrl);
+        logger.info("Requesting URL: {}", url);
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<CollisionRequest> entity = new HttpEntity<>(new CollisionRequest(playerId, otherPlayerId), headers);
+
+        ResponseEntity<Boolean> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                entity,
+                Boolean.class
+        );
+        Boolean wouldCollide = response.getBody();
+        logger.info("Would collide: {}", wouldCollide);
+        return wouldCollide;
+    }
+        /*HttpHeaders headers = new HttpHeaders();
+        HttpEntity<CollisionRequest> entity = new HttpEntity<>(new CollisionRequest(playerId, otherPlayerId), headers);
+
+        ResponseEntity<Boolean> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                entity,
+                Boolean.class
+        );
+        return Boolean.FALSE.equals(response.getBody());*/
+
+
+
 }

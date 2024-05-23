@@ -57,19 +57,21 @@ public class PlayerController {
     }
     @PostMapping("/wouldCollideWith")
     public ResponseEntity<Boolean> wouldCollideWith(@RequestBody CollisionRequest collisionRequest) {
+        logger.info("Checking if player {} would collide with player {}", collisionRequest.getPlayerId(), collisionRequest.getOtherPlayerId());
+
         Player player = playerService.getPlayerById(collisionRequest.getPlayerId());
         Player targetPlayer = playerService.getPlayerById(collisionRequest.getOtherPlayerId());
-        int newX = collisionRequest.getNewX();
-        int newY = collisionRequest.getNewY();
 
-        boolean wouldCollide = playerService.wouldCollideWith(player, targetPlayer, newX, newY);
+        boolean wouldCollide = playerService.wouldCollideWith(player, targetPlayer);
+        System.out.println(wouldCollide);
 
         return ResponseEntity.ok(wouldCollide);
     }
 
-    @GetMapping("/getAllPlayers")
-    public ResponseEntity<List<Player>> getAllPlayers() {
-        List<Player> players = playerService.getAllPlayers();
+    @GetMapping("/getAllPlayers/{playerId}")
+    public ResponseEntity<List<Player>> getAllPlayers(@PathVariable Long playerId) {
+        List<Player> players = playerService.getAllOtherPlayers(playerId);
+        logger.info("Here are the players: {}", players);
         return ResponseEntity.ok(players);
     }
 

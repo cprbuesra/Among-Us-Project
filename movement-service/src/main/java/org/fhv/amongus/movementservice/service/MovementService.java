@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -54,15 +55,19 @@ public class MovementService {
             Player player = playerServiceClient.findPlayerById(move.getPlayerId());
             List<Player> otherPlayers = playerServiceClient.findAllOtherPlayers(move.getPlayerId());
             for (Player otherPlayer : otherPlayers){
-                if (player.wouldCollideWith(otherPlayer, newX, newY)){
-                    throw new Exception("Player would collide with another player");
+
+                logger.info("The player which was send {}" , otherPlayer );
+                 if (playerServiceClient.wouldCollideWith(player.getPlayerId(), otherPlayer.getPlayerId())) {
+                    logger.info("Player would collide with another player");
                 }
             }
+
             playerPosition.setPlayerId(move.getPlayerId());
             playerPosition.setNewPositionX(newX);
             playerPosition.setNewPositionY(newY);
             playerPosition.setFlip(move.isFlip());
             playerPosition.setSessionId(move.getSessionId());
+            logger.info("Player {} moved to new position: ({}, {})", move.getPlayerId(), player.getX(), player.getY());
         } else {
             logger.info("Player {} tried to move out of boundaries", move.getPlayerId());
         }

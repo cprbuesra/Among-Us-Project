@@ -6,6 +6,7 @@ import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,5 +31,9 @@ public class PlayerRepositoryService {
 
     public void deletePlayer(Player player) {
         playerRepository.delete(player);
+    }
+
+    public List<Player> findAllOtherPlayers(Long playerId) {
+        return playerRepository.findAllOtherPlayers(playerId);
     }
 }

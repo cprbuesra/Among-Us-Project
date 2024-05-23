@@ -23,6 +23,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PlayerService {
+    public static final double NEAR_DISTANCE = 1.5;
+
 
     private final PlayerRepositoryService playerRepositoryService;
     private final JwtTokenService jwtTokenService;
@@ -39,8 +41,8 @@ public class PlayerService {
             logger.info("Saving player with Username: {}", authRequest.getUsername());
             var player = Player.builder()
                     .username(authRequest.getUsername())
-                    .x(335)
-                    .y(20)
+                    .x(0)
+                    .y(0)
                     .flip(false)
                     .build();
             playerRepositoryService.savePlayer(player);
@@ -68,8 +70,56 @@ public class PlayerService {
         }
     }
 
+    public List<PlayerInfo> updateRoles(List<Player> players) {
+        logger.info("These are the players: {}", players);
 
-    public List<PlayerInfo> updateRoles(List<Player> players){
+        Collections.shuffle(players);
+
+        int totalPlayers = players.size();
+        int numberOfImpostors = Math.max(1, totalPlayers / 3);
+        List<PlayerInfo> playerInfos = new ArrayList<>();
+
+        for (int i = 0; i < totalPlayers; i++) {
+            Player currentPlayer = players.get(i);
+
+            // Fetch the player from the database to get the current positions
+            Player playerFromDb = playerRepository.findById(currentPlayer.getPlayerId()).orElse(null);
+            if (playerFromDb == null) {
+                continue;
+            }
+
+            // Get current x and y positions from the database
+            int currentX = playerFromDb.getX();
+            int currentY = playerFromDb.getY();
+
+            if (i < numberOfImpostors) {
+                currentPlayer.setRole(Role.IMPOSTER);
+            } else {
+                currentPlayer.setRole(Role.CREWMATE);
+            }
+
+            // Set positions to the current positions fetched from the database
+            currentPlayer.setX(currentX);
+            currentPlayer.setY(currentY);
+
+            logger.info("This is the updated player: {}", currentPlayer);
+            playerRepository.save(currentPlayer);
+
+            PlayerInfo playerInfo = new PlayerInfo();
+            playerInfo.setPlayerId(currentPlayer.getPlayerId());
+            playerInfo.setUsername(currentPlayer.getUsername());
+            playerInfo.setRole(String.valueOf(currentPlayer.getRole()));
+
+            playerInfos.add(playerInfo);
+        }
+
+        return playerInfos;
+    }
+
+
+    /*public List<PlayerInfo> updateRoles(List<Player> players){
+        logger.info("These are the players: {}" ,players);
+
         Collections.shuffle(players);
 
         int totalPlayers = players.size();
@@ -81,6 +131,7 @@ public class PlayerService {
             } else {
                 players.get(i).setRole(Role.CREWMATE);
             }
+            logger.info("These is the updated player: {}" ,players.get(i));
             playerRepository.save(players.get(i));
 
             PlayerInfo playerInfo = new PlayerInfo();
@@ -92,7 +143,7 @@ public class PlayerService {
             playerInfos.add(playerInfo);
         }
         return playerInfos;
-    }
+    }*/
 
 
     public void performAction(Player player, Action action, Player targetPlayer) {
@@ -128,10 +179,31 @@ public class PlayerService {
     }
 
     public void eliminatePlayer(Player player, Player otherPlayer, Action action) {
-        player.eliminatePlayer(otherPlayer, action);
+        if (action == Action.KILL && player.getRole() == Role.IMPOSTER) {
+            double distance = calculateDistance(player, otherPlayer);
+            if (distance <= NEAR_DISTANCE) {
+                otherPlayer.setRole(Role.GHOST);
+            }
+        }
     }
 
-    public boolean wouldCollideWith(Player player, Player otherPlayer, int newX, int newY) {
-        return otherPlayer.getX() == newX && otherPlayer.getY() == newY;
+    public boolean wouldCollideWith(Player player, Player otherPlayer) {
+        final int COLLISION_THRESHOLD = 30;
+
+        logger.info("This is the position of the player {} {}", player.getX(), player.getY());
+        logger.info("This is the position of the other player {} {}", otherPlayer.getX(), otherPlayer.getY());
+
+        int deltaX = player.getX() - otherPlayer.getX();
+        int deltaY = player.getY() - otherPlayer.getY();
+        double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        logger.info("Distance between players: {}", distance);
+
+        return distance <= COLLISION_THRESHOLD;
+    }
+
+
+    public List<Player> getAllOtherPlayers(Long playerId) {
+        return playerRepositoryService.findAllOtherPlayers(playerId);
     }
 }
