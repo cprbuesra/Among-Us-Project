@@ -1,10 +1,9 @@
 package org.fhv.amongus.player.player.DTO;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.fhv.amongus.player.player.model.Action;
-@Getter
-@Setter
+
+@Data
 public class EliminationRequest {
     private Long playerId;
     private Long targetPlayerId;

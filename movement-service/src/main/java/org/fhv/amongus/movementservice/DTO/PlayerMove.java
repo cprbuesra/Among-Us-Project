@@ -16,4 +16,5 @@ public class PlayerMove {
     private boolean flip;
     private String roomId;
     private String sessionId;
+    private String token;
 }

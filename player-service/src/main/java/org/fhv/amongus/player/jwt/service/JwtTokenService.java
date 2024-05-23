@@ -29,6 +29,10 @@ public class JwtTokenService {
         return jwtTokenRepository.findByTokenAndSessionId(token, sessionId);
     }
 
+    public Optional<JwtToken> findByToken (String token){
+        return jwtTokenRepository.findByToken(token);
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }

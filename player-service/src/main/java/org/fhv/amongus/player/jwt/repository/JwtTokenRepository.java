@@ -13,4 +13,7 @@ public interface JwtTokenRepository extends JpaRepository<JwtToken, Long> {
     Optional<JwtToken> findByTokenAndSessionId(String token, String sessionId);
     void deleteByPlayer(Player player);
     Optional<JwtToken> findByPlayer(Player player);
+
+    Optional<JwtToken> findByToken(String token);
 }
+

@@ -1,6 +1,7 @@
 package org.fhv.amongus.player.config;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.player.jwt.JwtTokenAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -36,6 +38,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize.requestMatchers("/api/**","/ws/**", "/h2-console/**")
                                 .permitAll()
+                                .requestMatchers(new MovementServiceRequestMatcher())
+                                .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
@@ -46,6 +50,19 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
+    }
+
+    public static class MovementServiceRequestMatcher implements RequestMatcher {
+        @Override
+        public boolean matches(HttpServletRequest request) {
+            String remoteHost = request.getRemoteHost();
+
+            // Log the remote host for debugging purposes
+            System.out.println("Remote Host: " + remoteHost);
+
+            // Assuming Movement Service is running on localhost (127.0.0.1)
+            return "127.0.0.1".equals(remoteHost) || "localhost".equals(remoteHost);
+        }
     }
 }
 
