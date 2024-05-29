@@ -59,7 +59,7 @@ public class GameRoomController {
     }
 
     @DeleteMapping("/deleteGameRoom")
-    public void deleteGameRoom(@RequestParam String roomId, @RequestParam String sessionId, @RequestParam String username) throws Exception {
+    public void deleteGameRoom(@RequestParam String roomId, @RequestParam String sessionId, @RequestParam String username) {
 
 
         Long roomIdLong = Long.parseLong(roomId);
