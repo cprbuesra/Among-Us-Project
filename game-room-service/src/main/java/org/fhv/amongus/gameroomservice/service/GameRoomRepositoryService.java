@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 public class GameRoomRepositoryService {
 
     private final GameRoomRepository gameRoomRepository;
+    private final PlayerServiceClient playerServiceClient;
+    private final MovementServiceClient movementServiceClient;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public List<GameRoomDTO> getGameRooms() {
@@ -38,11 +40,9 @@ public class GameRoomRepositoryService {
         GameRoom gameRoom = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
 
-        PlayerInfo playerInfo = new PlayerInfo(playerId, username);
+        PlayerInfo playerInfo = new PlayerInfo(playerId, username, "ALIVE");
         gameRoom.getPlayers().add(playerInfo);
         gameRoomRepository.save(gameRoom);
-
-        //TODO: Notify Player Service that player has joined the game room
 
         return GameRoomMapper.toDTO(gameRoom);
     }
@@ -95,5 +95,25 @@ public class GameRoomRepositoryService {
         GameRoom updatedRoom = gameRoomRepository.save(gameRoom);
 
         return GameRoomMapper.toDTO(updatedRoom);
+    }
+
+    public void handleVoteResult(Long gameRoomId, Long votedPlayerId) {
+        logger.info("Handling vote result for game room: {} and player: {}", gameRoomId, votedPlayerId);
+
+        GameRoom gameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow();
+        gameRoom.getPlayers().stream()
+                .filter(player -> player.getPlayerId().equals(votedPlayerId))
+                .findFirst()
+                .ifPresent(player -> player.setStatus("DEAD"));
+
+
+        // Notify Player Service to update database
+        playerServiceClient.updatePlayerStatus(votedPlayerId, "DEAD");
+
+        // Notify Movement Service to update movement logic
+        movementServiceClient.updatePlayerStatus(votedPlayerId, "DEAD");
+
+        // Save changes
+        gameRoomRepository.save(gameRoom);
     }
 }

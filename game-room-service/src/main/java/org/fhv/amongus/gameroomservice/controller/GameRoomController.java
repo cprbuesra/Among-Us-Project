@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.CreateRoomRequest;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.DTO.RoomRequest;
+import org.fhv.amongus.gameroomservice.DTO.VoteResultRequest;
 import org.fhv.amongus.gameroomservice.service.GameRoomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -22,7 +24,6 @@ public class GameRoomController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final GameRoomService gameRoomService;
-    private SimpMessagingTemplate simpMessagingTemplate;
 
     @PostMapping("/createGameRoom")
     public GameRoomDTO createGameRoom(@RequestBody CreateRoomRequest createRoomRequest) throws Exception {
@@ -80,6 +81,14 @@ public class GameRoomController {
         return gameRoomService.leaveGameRoom(roomRequest.getRoomId(), roomRequest.getPlayerId(), roomRequest.getUsername());
     }
 
+    @PostMapping("/voteResult")
+    public ResponseEntity<String> handleVoteResult(@RequestBody VoteResultRequest request) {
+        logger.info("This is the request: {}", request);
 
+        Long gameRoomId = Long.parseLong(request.getGameRoomId());
+        Long votedPlayerId = Long.parseLong(request.getVotedPlayerId());
 
+        gameRoomService.handleVoteResult(gameRoomId, votedPlayerId);
+        return ResponseEntity.ok("Vote result handled");
+    }
 }

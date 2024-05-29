@@ -39,4 +39,8 @@ public class GameRoomService {
     public GameRoomDTO startGame(Long roomId) {
         return gameRoomRepositoryService.startGame(roomId);
     }
+
+    public void handleVoteResult(Long gameRoomId, Long votedPlayerId) {
+        gameRoomRepositoryService.handleVoteResult(gameRoomId, votedPlayerId);
+    }
 }

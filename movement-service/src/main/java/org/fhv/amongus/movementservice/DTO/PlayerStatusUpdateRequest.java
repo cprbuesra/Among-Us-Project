@@ -1,16 +1,13 @@
-package org.fhv.amongus.gameroomservice.DTO;
+package org.fhv.amongus.movementservice.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class PlayerDTO {
-
+@NoArgsConstructor
+public class PlayerStatusUpdateRequest {
     private Long playerId;
-    private String username;
     private String status;
-
 }

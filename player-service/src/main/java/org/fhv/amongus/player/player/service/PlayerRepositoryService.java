@@ -23,12 +23,18 @@ public class PlayerRepositoryService {
         return playerRepository.findByUsername(username);
     }
 
-    public Player savePlayer(Player player) {
+    public void savePlayer(Player player) {
         playerRepository.save(player);
-        return player;
     }
 
     public void deletePlayer(Player player) {
         playerRepository.delete(player);
+    }
+
+    public void updatePlayerStatus(Long playerId, String status) {
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+        player.setStatus(status);
+        playerRepository.save(player);
     }
 }

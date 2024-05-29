@@ -43,6 +43,7 @@ public class PlayerService {
                     .x(335)
                     .y(20)
                     .flip(false)
+                    .status("ALIVE")
                     .build();
             playerRepositoryService.savePlayer(player);
 
@@ -83,10 +84,13 @@ public class PlayerService {
             players.get(i).setRole(i < numberOfImpostors ? Role.IMPOSTER : Role.CREWMATE);
             playerRepository.save(players.get(i));
         }
-
     }
 
     public List<Player> getAllPlayers() {
         return playerRepository.findAll();
+    }
+
+    public void updatePlayerStatus(Long playerId, String status) {
+        playerRepositoryService.updatePlayerStatus(playerId, status);
     }
 }
