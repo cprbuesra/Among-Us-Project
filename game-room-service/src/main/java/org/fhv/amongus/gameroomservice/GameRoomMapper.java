@@ -17,7 +17,7 @@ public class GameRoomMapper {
             return null;
         }
         List<PlayerDTO> playerDTOs = gameRoom.getPlayers().stream()
-                .map(player -> new PlayerDTO(player.getPlayerId(), player.getUsername()))
+                .map(player -> new PlayerDTO(player.getPlayerId(), player.getUsername(), player.getStatus()))
                 .collect(Collectors.toList());
 
         return new GameRoomDTO(
@@ -35,7 +35,11 @@ public class GameRoomMapper {
             return null;
         }
         List<Player> players = gameRoomDTO.getPlayers().stream()
-                .map(dto -> Player.builder().playerId(dto.getPlayerId()).username(dto.getUsername()).build())
+                .map(dto -> Player.builder()
+                        .playerId(dto.getPlayerId())
+                        .username(dto.getUsername())
+                        .status(dto.getStatus())
+                        .build())
                 .collect(Collectors.toList());
 
         GameRoom gameRoom = new GameRoom(

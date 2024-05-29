@@ -1,10 +1,8 @@
-package org.fhv.amongus.chat.model;
+package org.fhv.amongus.chat.chat.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -15,5 +13,5 @@ public class ChatMessageDTO {
     private String content;
     private String sender;
     private ChatMessage.MessageType type;
-    private LocalDateTime timestamp;
+    private Long roomId;
 }

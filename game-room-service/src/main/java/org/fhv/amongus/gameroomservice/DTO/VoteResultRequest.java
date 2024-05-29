@@ -5,12 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class PlayerDTO {
+@NoArgsConstructor
+public class VoteResultRequest {
 
-    private Long playerId;
-    private String username;
-    private String status;
-
+    private String gameRoomId;
+    private String votedPlayerId;
 }

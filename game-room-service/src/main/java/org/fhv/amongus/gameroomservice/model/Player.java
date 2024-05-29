@@ -19,6 +19,7 @@ public class Player {
     private Long playerId;
     private String username;
     private String role;
+    private String status;
 
     public Player(Long playerId, String username) {
         this.playerId = playerId;

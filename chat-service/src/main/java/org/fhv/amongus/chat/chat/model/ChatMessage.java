@@ -1,4 +1,4 @@
-package org.fhv.amongus.chat.model;
+package org.fhv.amongus.chat.chat.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +21,7 @@ public class ChatMessage {
     private String content;
     private String sender;
     private MessageType type;
-    private LocalDateTime timestamp;
+    private Long roomId;
 
     public enum MessageType {
         CHAT,

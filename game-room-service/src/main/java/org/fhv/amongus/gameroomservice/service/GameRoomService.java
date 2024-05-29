@@ -98,4 +98,8 @@ public class GameRoomService {
     public String getRole(String username) {
         return gameRoomRepositoryService.getRole(username);
     }
+
+    public void handleVoteResult(Long gameRoomId, Long votedPlayerId) {
+        gameRoomRepositoryService.handleVoteResult(gameRoomId, votedPlayerId);
+    }
 }

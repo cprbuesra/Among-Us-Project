@@ -1,6 +1,7 @@
-package org.fhv.amongus.chat.model;
+package org.fhv.amongus.chat.chat.model;
 
-
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChatMessageMapper {
 
@@ -14,7 +15,7 @@ public class ChatMessageMapper {
                 chatMessage.getContent(),
                 chatMessage.getSender(),
                 chatMessage.getType(),
-                chatMessage.getTimestamp()
+                chatMessage.getRoomId()
         );
     }
 
@@ -28,7 +29,21 @@ public class ChatMessageMapper {
                 chatMessageDTO.getContent(),
                 chatMessageDTO.getSender(),
                 chatMessageDTO.getType(),
-                chatMessageDTO.getTimestamp()
+                chatMessageDTO.getRoomId()
         );
+    }
+
+    // Convert a list of ChatMessage entities to a list of ChatMessageDTOs
+    public static List<ChatMessageDTO> toDTOList(List<ChatMessage> chatMessages) {
+        return chatMessages.stream()
+                .map(ChatMessageMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Convert a list of ChatMessageDTOs to a list of ChatMessage entities
+    public static List<ChatMessage> fromDTOList(List<ChatMessageDTO> chatMessageDTOs) {
+        return chatMessageDTOs.stream()
+                .map(ChatMessageMapper::fromDTO)
+                .collect(Collectors.toList());
     }
 }

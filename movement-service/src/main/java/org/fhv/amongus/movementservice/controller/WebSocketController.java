@@ -1,4 +1,4 @@
-package org.fhv.amongus.movementservice;
+package org.fhv.amongus.movementservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.movementservice.DTO.PlayerEndMove;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
-public class MovementController {
+public class WebSocketController {
 
     private final MovementService movementService;
     private final MovementMessageSender movementMessageSender;

@@ -13,4 +13,5 @@ public class PlayerInfo {
 
     private Long playerId;
     private String username;
+    private String status = "ALIVE";
 }

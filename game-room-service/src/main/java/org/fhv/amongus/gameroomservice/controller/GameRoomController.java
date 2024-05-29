@@ -2,6 +2,10 @@ package org.fhv.amongus.gameroomservice.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.fhv.amongus.gameroomservice.DTO.CreateRoomRequest;
+import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
+import org.fhv.amongus.gameroomservice.DTO.RoomRequest;
+import org.fhv.amongus.gameroomservice.DTO.VoteResultRequest;
 import org.fhv.amongus.gameroomservice.DTO.*;
 import org.fhv.amongus.gameroomservice.model.Player;
 import org.fhv.amongus.gameroomservice.service.GameRoomService;
@@ -59,7 +63,7 @@ public class GameRoomController {
     }
 
     @DeleteMapping("/deleteGameRoom")
-    public void deleteGameRoom(@RequestParam String roomId, @RequestParam String sessionId, @RequestParam String username) throws Exception {
+    public void deleteGameRoom(@RequestParam String roomId, @RequestParam String sessionId, @RequestParam String username) {
 
 
         Long roomIdLong = Long.parseLong(roomId);
@@ -92,5 +96,14 @@ public class GameRoomController {
         return ResponseEntity.ok(assignRolesDTO);
     }
 
+    @PostMapping("/voteResult")
+    public ResponseEntity<String> handleVoteResult(@RequestBody VoteResultRequest request) {
+        logger.info("This is the request: {}", request);
 
+        Long gameRoomId = Long.parseLong(request.getGameRoomId());
+        Long votedPlayerId = Long.parseLong(request.getVotedPlayerId());
+
+        gameRoomService.handleVoteResult(gameRoomId, votedPlayerId);
+        return ResponseEntity.ok("Vote result handled");
+    }
 }

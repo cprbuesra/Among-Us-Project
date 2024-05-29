@@ -41,9 +41,10 @@ public class PlayerService {
             logger.info("Saving player with Username: {}", authRequest.getUsername());
             var player = Player.builder()
                     .username(authRequest.getUsername())
-                    .x(0)
-                    .y(0)
+                    .x(335)
+                    .y(20)
                     .flip(false)
+                    .status("ALIVE")
                     .build();
             playerRepositoryService.savePlayer(player);
 
@@ -205,5 +206,9 @@ public class PlayerService {
 
     public List<Player> getAllOtherPlayers(Long playerId) {
         return playerRepositoryService.findAllOtherPlayers(playerId);
+    }
+
+    public void updatePlayerStatus(Long playerId, String status) {
+        playerRepositoryService.updatePlayerStatus(playerId, status);
     }
 }

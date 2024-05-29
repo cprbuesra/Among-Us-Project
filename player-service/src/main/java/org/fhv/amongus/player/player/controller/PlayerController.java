@@ -3,12 +3,12 @@ package org.fhv.amongus.player.player.controller;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.player.jwt.DTO.AuthRequest;
 import org.fhv.amongus.player.jwt.DTO.AuthResponse;
-import org.fhv.amongus.player.jwt.model.JwtToken;
 import org.fhv.amongus.player.jwt.service.JwtTokenService;
 import org.fhv.amongus.player.player.DTO.ActionRequest;
 import org.fhv.amongus.player.player.DTO.CollisionRequest;
 import org.fhv.amongus.player.player.DTO.PlayerInfo;
 import org.fhv.amongus.player.player.model.Action;
+import org.fhv.amongus.player.player.DTO.PlayerStatusUpdateRequest;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.service.PlayerService;
 import org.springframework.http.ResponseEntity;
@@ -92,5 +92,15 @@ public class PlayerController {
         playerService.eliminatePlayer(player, targetPlayer, action);
 
         return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/status")
+    public ResponseEntity<String> updatePlayerStatus(@RequestBody PlayerStatusUpdateRequest request) {
+
+        logger.info("Updating player status with this request: {}", request);
+        Long playerId = Long.parseLong(request.getPlayerId());
+
+        playerService.updatePlayerStatus(playerId, request.getStatus());
+        return ResponseEntity.ok("Player status updated");
     }
 }
