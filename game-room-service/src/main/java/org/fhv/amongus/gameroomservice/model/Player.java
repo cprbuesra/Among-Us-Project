@@ -25,5 +25,11 @@ public class Player {
         this.playerId = playerId;
         this.username = username;
     }
+
+    public Player(Long playerId, String username, String alive) {
+        this.playerId = playerId;
+        this.username = username;
+        this.status = alive;
+    }
 }
 
