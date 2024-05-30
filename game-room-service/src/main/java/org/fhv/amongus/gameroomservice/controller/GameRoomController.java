@@ -12,9 +12,6 @@ import org.fhv.amongus.gameroomservice.service.GameRoomService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -96,14 +93,14 @@ public class GameRoomController {
         return ResponseEntity.ok(assignRolesDTO);
     }
 
-    @PostMapping("/voteResult")
-    public ResponseEntity<String> handleVoteResult(@RequestBody VoteResultRequest request) {
+    @PostMapping("/eliminatePlayer")
+    public ResponseEntity<String> eliminatePlayer(@RequestBody VoteResultRequest request) {
         logger.info("This is the request: {}", request);
 
         Long gameRoomId = Long.parseLong(request.getGameRoomId());
         Long votedPlayerId = Long.parseLong(request.getVotedPlayerId());
 
-        gameRoomService.handleVoteResult(gameRoomId, votedPlayerId);
+        gameRoomService.eliminatePlayer(gameRoomId, votedPlayerId);
         return ResponseEntity.ok("Vote result handled");
     }
 }

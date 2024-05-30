@@ -54,11 +54,17 @@ public class MovementService {
         if (boundaryService.isWithinMovementBoundaries(absoluteX, absoluteY)) {
             Player player = playerServiceClient.findPlayerById(move.getPlayerId());
             List<Player> otherPlayers = playerServiceClient.findAllOtherPlayers(move.getPlayerId());
-            for (Player otherPlayer : otherPlayers){
 
+            for (Player otherPlayer : otherPlayers){
                 logger.info("The player which was send {}" , otherPlayer );
+
                  if (playerServiceClient.wouldCollideWith(player.getPlayerId(), otherPlayer.getPlayerId())) {
                     logger.info("Player would collide with another player");
+                    String targetPlayerId = otherPlayer.getPlayerId().toString();
+                    playerPosition.setWouldCollide(true);
+                    playerPosition.setTargetPlayerId(targetPlayerId);
+                } else {
+                    playerPosition.setWouldCollide(false);
                 }
             }
 
@@ -67,6 +73,7 @@ public class MovementService {
             playerPosition.setNewPositionY(newY);
             playerPosition.setFlip(move.isFlip());
             playerPosition.setSessionId(move.getSessionId());
+
             logger.info("Player {} moved to new position: ({}, {})", move.getPlayerId(), player.getX(), player.getY());
         } else {
             logger.info("Player {} tried to move out of boundaries", move.getPlayerId());

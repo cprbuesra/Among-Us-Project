@@ -29,9 +29,10 @@ public class PlayerPositionUpdateListener {
     public void receivePlayerPositionUpdate(@Payload PlayerPositionUpdateRequest request) {
         if (request == null || request.getPlayerId() == null) {
             logger.error("Received update with null request or playerId");
-            return; // Optionally throw an exception or handle it according to your error handling policy
+            return;
         }
 
+        logger.info("Received update: {}", request);
 
         playerRepository.findById(request.getPlayerId())
                 .ifPresentOrElse(player -> {
@@ -42,7 +43,6 @@ public class PlayerPositionUpdateListener {
                     logger.info("Player position updated: {}", player);
                 }, () -> {
                     logger.error("Player not found with ID: {}", request.getPlayerId());
-                    // Handle the case where player is not found, e.g., throw a custom exception or return an error response
                 });
     }
 }

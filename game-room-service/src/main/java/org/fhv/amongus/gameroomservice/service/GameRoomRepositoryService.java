@@ -5,7 +5,6 @@ import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.GameRoomMapper;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
 import org.fhv.amongus.gameroomservice.model.Player;
-import org.fhv.amongus.gameroomservice.model.PlayerInfo;
 import org.fhv.amongus.gameroomservice.repository.GameRoomRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +110,7 @@ public class GameRoomRepositoryService {
         return gameRoomRepository.getRoleByUsername(username);
     }
 
-    public void handleVoteResult(Long gameRoomId, Long votedPlayerId) {
+    public void eliminatePlayer(Long gameRoomId, Long votedPlayerId) {
         logger.info("Handling vote result for game room: {} and player: {}", gameRoomId, votedPlayerId);
 
         GameRoom gameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow();

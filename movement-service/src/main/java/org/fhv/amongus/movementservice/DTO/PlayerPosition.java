@@ -13,4 +13,6 @@ public class PlayerPosition {
     private int newPositionY;
     private boolean flip;
     private String sessionId;
+    private boolean wouldCollide;
+    private String targetPlayerId;
 }

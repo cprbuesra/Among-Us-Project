@@ -4,10 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
-import org.fhv.amongus.gameroomservice.DTO.PlayerDTO;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
 import org.fhv.amongus.gameroomservice.model.Player;
-import org.fhv.amongus.gameroomservice.model.PlayerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,7 +15,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -99,7 +96,7 @@ public class GameRoomService {
         return gameRoomRepositoryService.getRole(username);
     }
 
-    public void handleVoteResult(Long gameRoomId, Long votedPlayerId) {
-        gameRoomRepositoryService.handleVoteResult(gameRoomId, votedPlayerId);
+    public void eliminatePlayer(Long gameRoomId, Long votedPlayerId) {
+        gameRoomRepositoryService.eliminatePlayer(gameRoomId, votedPlayerId);
     }
 }
