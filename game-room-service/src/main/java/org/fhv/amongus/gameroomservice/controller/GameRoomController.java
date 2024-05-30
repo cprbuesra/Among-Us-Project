@@ -74,8 +74,6 @@ public class GameRoomController {
         if (roomRequest.getRoomId() == null || roomRequest.getPlayerId() == null || roomRequest.getUsername() == null) {
             throw new Exception("Room id, player id and username cannot be empty");
         }
-
-
         logger.info("{} is leaving game room {}.", roomRequest.getUsername(), roomRequest.getRoomId());
 
         return gameRoomService.leaveGameRoom(roomRequest.getRoomId(), roomRequest.getPlayerId(), roomRequest.getUsername());
