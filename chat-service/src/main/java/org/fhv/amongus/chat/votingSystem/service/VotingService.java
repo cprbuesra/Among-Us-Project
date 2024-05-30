@@ -70,7 +70,7 @@ public class VotingService {
         } else {
             String mostVotedPlayerId = Collections.max(voteCounts.entrySet(), Map.Entry.comparingByValue()).getKey();
             String mostVotedPlayerUsername = voteSession.getPlayerUsernames().get(mostVotedPlayerId);
-            logger.info("Player {} ({}) was voted out", mostVotedPlayerId, mostVotedPlayerUsername);
+            logger.info("Player {} ({}) was voted out", mostVotedPlayerUsername, mostVotedPlayerId);
             voteResult.setStatus("votedOut");
             voteResult.setMostVotedPlayerId(mostVotedPlayerId);
             voteResult.setMostVotedPlayerUsername(mostVotedPlayerUsername);

@@ -38,7 +38,9 @@ public class PlayerController {
     public List<PlayerInfo> assignAndFetchRoles(@RequestBody List<Player> players) throws Exception {
        return playerService.updateRoles(players);
     }
-    @PostMapping("/performAction")
+
+
+    /*@PostMapping("/performAction")
     public ResponseEntity<Void> performAction(@RequestBody ActionRequest actionRequest) {
         Player player = playerService.getPlayerById(actionRequest.getPlayerId().getPlayerId());
         Player targetPlayer = playerService.getPlayerById(actionRequest.getTargetPlayerId().getPlayerId());
@@ -48,6 +50,7 @@ public class PlayerController {
 
         return ResponseEntity.ok().build();
     }
+
     @PostMapping("/calculateDistance")
     public ResponseEntity<Double> calculateDistance(@RequestBody ActionRequest actionRequest) {
         Player player = playerService.getPlayerById(actionRequest.getPlayerId().getPlayerId());
@@ -55,6 +58,20 @@ public class PlayerController {
 
         return ResponseEntity.ok(playerService.calculateDistance(player, targetPlayer));
     }
+
+
+    @PostMapping("/eliminatePlayer")
+    public ResponseEntity<Void> eliminatePlayer(@RequestBody ActionRequest actionRequest) {
+        Player player = playerService.getPlayerById(actionRequest.getPlayerId().getPlayerId());
+        Player targetPlayer = playerService.getPlayerById(actionRequest.getTargetPlayerId().getPlayerId());
+        Action action = actionRequest.getAction();
+
+        playerService.eliminatePlayer(player, targetPlayer, action);
+
+        return ResponseEntity.ok().build();
+    }*/
+
+
     @PostMapping("/wouldCollideWith")
     public ResponseEntity<Boolean> wouldCollideWith(@RequestBody CollisionRequest collisionRequest) {
         logger.info("Checking if player {} would collide with player {}", collisionRequest.getPlayerId(), collisionRequest.getOtherPlayerId());
@@ -80,18 +97,6 @@ public class PlayerController {
         logger.info("Getting player with ID: {}", playerId);
         Player player = playerService.getPlayerById(playerId);
         return ResponseEntity.ok(player);
-    }
-
-
-    @PostMapping("/eliminatePlayer")
-    public ResponseEntity<Void> eliminatePlayer(@RequestBody ActionRequest actionRequest) {
-        Player player = playerService.getPlayerById(actionRequest.getPlayerId().getPlayerId());
-        Player targetPlayer = playerService.getPlayerById(actionRequest.getTargetPlayerId().getPlayerId());
-        Action action = actionRequest.getAction();
-
-        playerService.eliminatePlayer(player, targetPlayer, action);
-
-        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/status")
