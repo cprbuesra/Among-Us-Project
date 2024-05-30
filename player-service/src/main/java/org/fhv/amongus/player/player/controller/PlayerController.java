@@ -24,7 +24,6 @@ import java.util.List;
 public class PlayerController {
 
     private final PlayerService playerService;
-    private final JwtTokenService jwtTokenService;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 
@@ -38,38 +37,6 @@ public class PlayerController {
     public List<PlayerInfo> assignAndFetchRoles(@RequestBody List<Player> players) throws Exception {
        return playerService.updateRoles(players);
     }
-
-
-    /*@PostMapping("/performAction")
-    public ResponseEntity<Void> performAction(@RequestBody ActionRequest actionRequest) {
-        Player player = playerService.getPlayerById(actionRequest.getPlayerId().getPlayerId());
-        Player targetPlayer = playerService.getPlayerById(actionRequest.getTargetPlayerId().getPlayerId());
-        Action action = actionRequest.getAction();
-
-        playerService.performAction(player, action, targetPlayer);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/calculateDistance")
-    public ResponseEntity<Double> calculateDistance(@RequestBody ActionRequest actionRequest) {
-        Player player = playerService.getPlayerById(actionRequest.getPlayerId().getPlayerId());
-        Player targetPlayer = playerService.getPlayerById(actionRequest.getTargetPlayerId().getPlayerId());
-
-        return ResponseEntity.ok(playerService.calculateDistance(player, targetPlayer));
-    }
-
-
-    @PostMapping("/eliminatePlayer")
-    public ResponseEntity<Void> eliminatePlayer(@RequestBody ActionRequest actionRequest) {
-        Player player = playerService.getPlayerById(actionRequest.getPlayerId().getPlayerId());
-        Player targetPlayer = playerService.getPlayerById(actionRequest.getTargetPlayerId().getPlayerId());
-        Action action = actionRequest.getAction();
-
-        playerService.eliminatePlayer(player, targetPlayer, action);
-
-        return ResponseEntity.ok().build();
-    }*/
 
 
     @PostMapping("/wouldCollideWith")

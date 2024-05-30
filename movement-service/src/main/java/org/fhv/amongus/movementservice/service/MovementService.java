@@ -73,6 +73,7 @@ public class MovementService {
             playerPosition.setNewPositionY(newY);
             playerPosition.setFlip(move.isFlip());
             playerPosition.setSessionId(move.getSessionId());
+            playerPosition.setUsername(move.getUsername());
 
             logger.info("Player {} moved to new position: ({}, {})", move.getPlayerId(), player.getX(), player.getY());
         } else {

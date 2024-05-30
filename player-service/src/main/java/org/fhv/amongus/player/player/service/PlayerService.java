@@ -23,8 +23,6 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class PlayerService {
-    public static final double NEAR_DISTANCE = 1.5;
-
 
     private final PlayerRepositoryService playerRepositoryService;
     private final JwtTokenService jwtTokenService;
@@ -95,8 +93,10 @@ public class PlayerService {
 
             if (i < numberOfImpostors) {
                 currentPlayer.setRole(Role.IMPOSTER);
+                logger.info("Player {} is an impostor", currentPlayer.getUsername());
             } else {
                 currentPlayer.setRole(Role.CREWMATE);
+                logger.info("Player {} is a crewmate", currentPlayer.getUsername());
             }
 
             // Set positions to the current positions fetched from the database
@@ -118,75 +118,11 @@ public class PlayerService {
     }
 
 
-    /*public List<PlayerInfo> updateRoles(List<Player> players){
-        logger.info("These are the players: {}" ,players);
-
-        Collections.shuffle(players);
-
-        int totalPlayers = players.size();
-        int numberOfImpostors = Math.max(1, totalPlayers / 3);
-        List<PlayerInfo> playerInfos = new ArrayList<>();
-        for (int i = 0; i < totalPlayers; i++) {
-            if (i < numberOfImpostors) {
-                players.get(i).setRole(Role.IMPOSTER);
-            } else {
-                players.get(i).setRole(Role.CREWMATE);
-            }
-            logger.info("These is the updated player: {}" ,players.get(i));
-            playerRepository.save(players.get(i));
-
-            PlayerInfo playerInfo = new PlayerInfo();
-            playerInfo.setPlayerId(players.get(i).getPlayerId());
-            playerInfo.setUsername(players.get(i).getUsername());
-            playerInfo.setRole(String.valueOf(players.get(i).getRole()));
-
-
-            playerInfos.add(playerInfo);
-        }
-        return playerInfos;
-    }*/
-
-
-    public void performAction(Player player, Action action, Player targetPlayer) {
-        validatePlayer(player);
-        switch (action) {
-            case KILL:
-                eliminatePlayer(player, targetPlayer, action);
-                break;
-            // other action cases
-        }
-    }
-
-    public void validatePlayer(Player player) {
-        if (!playerRepository.existsById(player.getPlayerId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player not found");
-        }
-    }
-
     public Player getPlayerById(Long playerId) {
         return playerRepository.findById(playerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Player not found"));
     }
 
-
-    public List<Player> getAllPlayers() {
-        return playerRepository.findAll();
-    }
-
-    public double calculateDistance(Player player, Player otherPlayer) {
-        int xDistance = Math.abs(player.getX() - otherPlayer.getX());
-        int yDistance = Math.abs(player.getY() - otherPlayer.getY());
-        return Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
-    }
-
-    public void eliminatePlayer(Player player, Player otherPlayer, Action action) {
-        if (action == Action.KILL && player.getRole() == Role.IMPOSTER) {
-            double distance = calculateDistance(player, otherPlayer);
-            if (distance <= NEAR_DISTANCE) {
-                otherPlayer.setRole(Role.GHOST);
-            }
-        }
-    }
 
     public boolean wouldCollideWith(Player player, Player otherPlayer) {
         final int COLLISION_THRESHOLD = 30;
