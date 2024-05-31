@@ -30,7 +30,7 @@ public class VotingService {
         votingRepository.save(voteSession);
     }
 
-    public void castVote(String gameRoom, String voterId, String targetPlayerId, String voterUsername, String targetPlayerUsername) {
+    public void castVote(String gameRoom, String voterId, String targetPlayerId, String voterUsername, String targetPlayerUsername, String targetPlayerRole) {
         VoteSession voteSession = votingRepository.findByGameRoom(gameRoom);
         logger.info("this is the game room: {}", gameRoom);
         logger.info("this is the vote session: {}", voteSession);
@@ -47,7 +47,10 @@ public class VotingService {
             if (targetPlayerUsername != null && !targetPlayerUsername.isEmpty()) {
                 voteSession.getPlayerUsernames().put(targetPlayerId, targetPlayerUsername);
             }
-            logger.info("{} wants to vote out {} in game room {}", voterUsername, targetPlayerUsername, gameRoom);
+            if (targetPlayerRole != null && !targetPlayerRole.isEmpty()) {
+                voteSession.getPlayerRoles().put(targetPlayerId, targetPlayerRole);
+            }
+            logger.info("{} wants to vote out {} who has the role {} in game room {}", voterUsername, targetPlayerUsername, targetPlayerRole, gameRoom);
         }
         votingRepository.save(voteSession);
     }
@@ -61,6 +64,9 @@ public class VotingService {
         long totalVotes = voteCounts.values().stream().mapToLong(Long::longValue).sum();
         long skipVotes = voteCounts.getOrDefault("skip", 0L);
 
+        logger.info("Total votes: {}", totalVotes);
+        logger.info("Skip votes: {}", skipVotes);
+
         VoteResult voteResult = new VoteResult();
         voteResult.setVoteCount(voteCounts);
 
@@ -68,13 +74,34 @@ public class VotingService {
             logger.info("Voting skipped, no player was voted out");
             voteResult.setStatus("skipped");
         } else {
-            String mostVotedPlayerId = Collections.max(voteCounts.entrySet(), Map.Entry.comparingByValue()).getKey();
-            String mostVotedPlayerUsername = voteSession.getPlayerUsernames().get(mostVotedPlayerId);
-            logger.info("Player {} ({}) was voted out", mostVotedPlayerUsername, mostVotedPlayerId);
-            voteResult.setStatus("votedOut");
-            voteResult.setMostVotedPlayerId(mostVotedPlayerId);
-            voteResult.setMostVotedPlayerUsername(mostVotedPlayerUsername);
+            long maxVoteCount = Collections.max(voteCounts.values());
+
+            long playersWithMaxVotes = voteCounts.values().stream()
+                    .filter(count -> count == maxVoteCount)
+                    .count();
+
+            if (playersWithMaxVotes > 1) {
+                logger.info("Tie in votes, no player was voted out");
+                voteResult.setStatus("tie");
+            } else {
+                String mostVotedPlayerId = voteCounts.entrySet().stream()
+                        .filter(entry -> entry.getValue() == maxVoteCount)
+                        .map(Map.Entry::getKey)
+                        .findFirst()
+                        .orElse(null);
+
+                String mostVotedPlayerUsername = voteSession.getPlayerUsernames().get(mostVotedPlayerId);
+                String mostVotedPlayerRole = voteSession.getPlayerRoles().get(mostVotedPlayerId);
+
+                logger.info("Player {} ({}) was voted out and he has the role {}", mostVotedPlayerUsername, mostVotedPlayerId, mostVotedPlayerRole);
+
+                voteResult.setStatus("votedOut");
+                voteResult.setMostVotedPlayerId(mostVotedPlayerId);
+                voteResult.setMostVotedPlayerUsername(mostVotedPlayerUsername);
+                voteResult.setMostVotedPlayerRole(mostVotedPlayerRole);
+            }
         }
         return voteResult;
     }
+
 }

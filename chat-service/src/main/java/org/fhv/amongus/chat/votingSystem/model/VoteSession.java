@@ -31,5 +31,11 @@ public class VoteSession {
     @Column(name = "username")
     private Map<String, String> playerUsernames = new HashMap<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "role_mapping", joinColumns = @JoinColumn(name = "vote_session_id"))
+    @MapKeyColumn(name = "player_id")
+    @Column(name = "role")
+    private Map<String, String> playerRoles = new HashMap<>();
+
     private int skipVotes = 0;
 }

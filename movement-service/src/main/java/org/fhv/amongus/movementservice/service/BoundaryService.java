@@ -20,6 +20,7 @@ public class BoundaryService {
 
     @PostConstruct
     public void init() throws IOException {
+        //Resource resource = resourceLoader.getResource("classpath:mapBoundsGhostMode.json");
         Resource resource = resourceLoader.getResource("classpath:mapBounds.json");
         ObjectMapper objectMapper = new ObjectMapper();
         mapBounds = objectMapper.readValue(resource.getInputStream(), new TypeReference<>() {

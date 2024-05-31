@@ -28,6 +28,7 @@ public class PlayerPositionUpdateListener {
     @RabbitListener(queues = "playerUpdateQueue")
     public void receivePlayerPositionUpdate(@Payload PlayerPositionUpdateRequest request) {
         if (request == null || request.getPlayerId() == null) {
+            logger.error("This is the request: {}", request);
             logger.error("Received update with null request or playerId");
             return;
         }

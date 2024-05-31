@@ -13,4 +13,5 @@ public class VoteRequest {
     private String voterUsername;
     private String targetPlayerId;
     private String targetPlayerUsername;
+    private String targetPlayerRole;
 }

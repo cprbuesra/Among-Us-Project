@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -77,7 +76,7 @@ public class MovementService {
 
             logger.info("Player {} moved to new position: ({}, {})", move.getPlayerId(), player.getX(), player.getY());
         } else {
-            logger.info("Player {} tried to move out of boundaries", move.getPlayerId());
+            logger.info("Player {} tried to move out of boundaries with this move {} {}", move.getPlayerId(), move.getPositionX(), move.getPositionY());
         }
         return playerPosition;
     }

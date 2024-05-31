@@ -12,6 +12,7 @@ import java.util.Map;
 public class VoteResult {
     private String mostVotedPlayerId;
     private String mostVotedPlayerUsername;
+    private String mostVotedPlayerRole;
     private Map<String, Long> voteCount;
     private String status;
 }

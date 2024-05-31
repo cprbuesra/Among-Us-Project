@@ -28,7 +28,7 @@ public class VotingController {
 
     @PostMapping("/vote")
     public ResponseEntity<String> castVote(@RequestBody VoteRequest request) {
-        votingService.castVote(request.getGameRoom(), request.getVoterId(), request.getTargetPlayerId(), request.getVoterUsername(), request.getTargetPlayerUsername());
+        votingService.castVote(request.getGameRoom(), request.getVoterId(), request.getTargetPlayerId(), request.getVoterUsername(), request.getTargetPlayerUsername(), request.getTargetPlayerRole());
         return ResponseEntity.ok("Vote cast");
     }
 

@@ -21,11 +21,6 @@ public class Player {
     private String role;
     private String status;
 
-    public Player(Long playerId, String username) {
-        this.playerId = playerId;
-        this.username = username;
-    }
-
     public Player(Long playerId, String username, String alive) {
         this.playerId = playerId;
         this.username = username;
