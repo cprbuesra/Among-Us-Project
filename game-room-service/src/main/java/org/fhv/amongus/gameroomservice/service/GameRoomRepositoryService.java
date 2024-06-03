@@ -2,6 +2,7 @@ package org.fhv.amongus.gameroomservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
+import org.fhv.amongus.gameroomservice.DTO.PlayerJoinDTO;
 import org.fhv.amongus.gameroomservice.GameRoomMapper;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
 import org.fhv.amongus.gameroomservice.model.Player;
@@ -87,12 +88,10 @@ public class GameRoomRepositoryService {
         GameRoom gameRoom = gameRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
 
-        for (Player player : gameRoom.getPlayers()) {
-            System.out.println();
-        }
-
         gameRoom.setStarted(true);
         GameRoom updatedRoom = gameRoomRepository.save(gameRoom);
+
+        logger.info("this is the updated room: {}", updatedRoom);
 
         return GameRoomMapper.toDTO(updatedRoom);
     }
@@ -120,13 +119,27 @@ public class GameRoomRepositoryService {
                 .ifPresent(player -> player.setStatus("DEAD"));
 
 
-        // Notify Player Service to update database
         playerServiceClient.updatePlayerStatus(votedPlayerId, "DEAD");
-
-        // Notify Movement Service to update movement logic
         movementServiceClient.updatePlayerStatus(votedPlayerId, "DEAD");
-
-        // Save changes
         gameRoomRepository.save(gameRoom);
+    }
+
+    public List<Player> getAllOtherPlayersByRoom(Long playerId, Long roomId) {
+        return gameRoomRepository.getAllOtherPlayersByRoom(playerId, roomId);
+    }
+
+    @Transactional
+    public List<PlayerJoinDTO> getCurrentPlayers(Long roomId) {
+        GameRoom gameRoom = gameRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+
+         List<Long> playerIDs = gameRoom.getPlayers().stream()
+                .map(Player::getPlayerId)
+                .collect(Collectors.toList());
+
+         List<PlayerJoinDTO> currentPlayers = playerServiceClient.getAllPlayers(playerIDs);
+         logger.info("Current players in room: {}", currentPlayers);
+
+        return currentPlayers;
     }
 }

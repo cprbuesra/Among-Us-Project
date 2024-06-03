@@ -6,8 +6,8 @@ import org.fhv.amongus.player.jwt.DTO.AuthResponse;
 import org.fhv.amongus.player.jwt.model.JwtToken;
 import org.fhv.amongus.player.jwt.service.JwtTokenRepositoryService;
 import org.fhv.amongus.player.jwt.service.JwtTokenService;
-import org.fhv.amongus.player.player.model.Action;
 import org.fhv.amongus.player.player.DTO.PlayerInfo;
+import org.fhv.amongus.player.player.DTO.PlayerJoinDTO;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.model.Role;
 import org.fhv.amongus.player.player.repository.PlayerRepository;
@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -139,12 +138,11 @@ public class PlayerService {
         return distance <= COLLISION_THRESHOLD;
     }
 
-
-    public List<Player> getAllOtherPlayers(Long playerId) {
-        return playerRepositoryService.findAllOtherPlayers(playerId);
-    }
-
     public void updatePlayerStatus(Long playerId, String status) {
         playerRepositoryService.updatePlayerStatus(playerId, status);
+    }
+
+    public List<PlayerJoinDTO> getAllPlayers(List<Long> playerIDs) {
+        return playerRepositoryService.getAllPlayers(playerIDs);
     }
 }

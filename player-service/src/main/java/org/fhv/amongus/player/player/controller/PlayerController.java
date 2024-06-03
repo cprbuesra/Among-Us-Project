@@ -4,11 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.player.jwt.DTO.AuthRequest;
 import org.fhv.amongus.player.jwt.DTO.AuthResponse;
 import org.fhv.amongus.player.jwt.service.JwtTokenService;
-import org.fhv.amongus.player.player.DTO.ActionRequest;
-import org.fhv.amongus.player.player.DTO.CollisionRequest;
-import org.fhv.amongus.player.player.DTO.PlayerInfo;
+import org.fhv.amongus.player.player.DTO.*;
 import org.fhv.amongus.player.player.model.Action;
-import org.fhv.amongus.player.player.DTO.PlayerStatusUpdateRequest;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.service.PlayerService;
 import org.springframework.http.ResponseEntity;
@@ -52,9 +49,9 @@ public class PlayerController {
         return ResponseEntity.ok(wouldCollide);
     }
 
-    @GetMapping("/getAllPlayers/{playerId}")
-    public ResponseEntity<List<Player>> getAllPlayers(@PathVariable Long playerId) {
-        List<Player> players = playerService.getAllOtherPlayers(playerId);
+   @PostMapping("/getAllPlayersByRoom")
+    public ResponseEntity<List<PlayerJoinDTO>> getAllOtherPlayersInRoom(@RequestBody List<Long> playerIDs) {
+        List<PlayerJoinDTO> players = playerService.getAllPlayers(playerIDs);
         logger.info("Here are the players: {}", players);
         return ResponseEntity.ok(players);
     }

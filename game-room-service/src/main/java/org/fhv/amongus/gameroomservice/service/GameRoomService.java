@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
+import org.fhv.amongus.gameroomservice.DTO.PlayerJoinDTO;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
 import org.fhv.amongus.gameroomservice.model.Player;
 import org.slf4j.Logger;
@@ -101,5 +102,13 @@ public class GameRoomService {
 
     public void eliminatePlayer(Long gameRoomId, Long votedPlayerId) {
         gameRoomRepositoryService.eliminatePlayer(gameRoomId, votedPlayerId);
+    }
+
+    public List<Player> getAllOtherPlayersByRoom(Long playerId, Long roomId) {
+        return gameRoomRepositoryService.getAllOtherPlayersByRoom(playerId, roomId);
+    }
+
+    public List<PlayerJoinDTO> getCurrentPlayers(Long roomId) {
+        return gameRoomRepositoryService.getCurrentPlayers(roomId);
     }
 }

@@ -31,6 +31,7 @@ public class WebSocketController {
         simpMessagingTemplate.convertAndSend("/topic/move/" + move.getRoomId(), playerPosition);
         logger.info("Player {} moved: {} {}, in room {}", move.getPlayerId(), playerPosition.getNewPositionY(), playerPosition.getNewPositionY(), move.getRoomId());
 
+
         PlayerPositionUpdateRequest updateRequest = new PlayerPositionUpdateRequest(
                 playerPosition.getPlayerId(),
                 playerPosition.getNewPositionX(),
@@ -46,12 +47,12 @@ public class WebSocketController {
 
         String username = endMove.getUsername();
         String roomId = endMove.getRoomId();
-        String sessionId = endMove.getSessionId();
+        String playerId = endMove.getPlayerId();
 
         logger.info("Player {} has stopped moving in room {}", username, roomId);
-        logger.info("Session ID: {}", sessionId);
+        logger.info("Player ID: {}", playerId);
 
-        simpMessagingTemplate.convertAndSend("/topic/moveEnd/" + roomId, "{\"sessionId\": \"" + sessionId + "\"}");
+        simpMessagingTemplate.convertAndSend("/topic/moveEnd/" + roomId, "{\"playerId\": \"" + playerId + "\"}");
     }
 
 

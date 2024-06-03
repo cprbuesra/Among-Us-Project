@@ -1,10 +1,10 @@
 package org.fhv.amongus.movementservice.service;
 
+import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.player.player.DTO.CollisionRequest;
 import org.fhv.amongus.player.player.model.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,17 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PlayerServiceClient {
-    private final String playerServiceUrl = "http://localhost:8084"; // Replace with the actual URL (8084) of the PlayerService microservice
+    private final String playerServiceUrl = "http://localhost:8084";
     private final RestTemplate restTemplate;
     private static final Logger logger = LoggerFactory.getLogger(PlayerServiceClient.class);
 
-    public PlayerServiceClient(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     public Player findPlayerById(Long playerId) {
         String url = String.format("%s/api/player/getPlayerById/%d", playerServiceUrl, playerId);
@@ -34,9 +31,7 @@ public class PlayerServiceClient {
         return player;
     }
 
-
-    public List<Player> findAllOtherPlayers(Long playerId) {
-        String url = String.format("%s/api/player/getAllPlayers/%d", playerServiceUrl, playerId);
+        /*String url = String.format("http://localhost:8084/api/player/status, request);
         logger.info("Requesting URL: {}", url);
 
         HttpHeaders headers = new HttpHeaders();
@@ -51,8 +46,8 @@ public class PlayerServiceClient {
 
         List<Player> players = response.getBody();
         logger.info("Other players data: {}", players);
-        return players;
-    }
+        return players;*/
+
 
     public boolean wouldCollideWith(Long playerId, Long otherPlayerId) {
         String url = String.format("%s/api/player/wouldCollideWith", playerServiceUrl);
@@ -71,17 +66,4 @@ public class PlayerServiceClient {
         logger.info("Would collide: {}", wouldCollide);
         return wouldCollide;
     }
-        /*HttpHeaders headers = new HttpHeaders();
-        HttpEntity<CollisionRequest> entity = new HttpEntity<>(new CollisionRequest(playerId, otherPlayerId), headers);
-
-        ResponseEntity<Boolean> response = restTemplate.exchange(
-                url,
-                HttpMethod.POST,
-                entity,
-                Boolean.class
-        );
-        return Boolean.FALSE.equals(response.getBody());*/
-
-
-
 }

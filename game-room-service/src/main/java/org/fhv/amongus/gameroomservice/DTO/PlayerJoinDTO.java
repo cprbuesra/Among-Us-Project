@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class JoinRoomDTO {
+@AllArgsConstructor
+public class PlayerJoinDTO {
     private String playerId;
-    private String role;
     private String username;
-    private List<PlayerJoinDTO> currentPlayers;
+    private int x;
+    private int y;
+    private boolean flip;
+    private String role;
+    private String status;
 }

@@ -16,6 +16,7 @@ public class MovementService {
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     private final BoundaryService boundaryService;
     private final PlayerServiceClient playerServiceClient;
+    private final GameRoomServiceClient gameRoomServiceClient;
     final int SHIP_WIDTH = 2160;
     final int SHIP_HEIGHT = 1160;
 
@@ -52,7 +53,7 @@ public class MovementService {
 
         if (boundaryService.isWithinMovementBoundaries(absoluteX, absoluteY)) {
             Player player = playerServiceClient.findPlayerById(move.getPlayerId());
-            List<Player> otherPlayers = playerServiceClient.findAllOtherPlayers(move.getPlayerId());
+            List<Player> otherPlayers = gameRoomServiceClient.findAllOtherPlayers(move.getPlayerId(), move.getRoomId());
 
             for (Player otherPlayer : otherPlayers){
                 logger.info("The player which was send {}" , otherPlayer );

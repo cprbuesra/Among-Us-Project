@@ -29,16 +29,15 @@ public class BoundaryGenerator {
         List<List<Integer>> result = new ArrayList<>();
 
         // Define the color range for green
-        int minRed = 0, maxRed = 37;
+        int minRed = 0, maxRed = 35;
         int minGreen = 245, maxGreen = 255;
-        int minBlue = 0, maxBlue = 10;
+        int minBlue = 0, maxBlue = 8;
 
         for (int y = 0; y < height; y++) {
             List<Integer> row = new ArrayList<>();
             for (int x = 0; x < width; x++) {
                 Color color = new Color(image.getRGB(x, y), true);
 
-                // Check if the color falls within the specified range
                 if (color.getRed() >= minRed && color.getRed() <= maxRed &&
                         color.getGreen() >= minGreen && color.getGreen() <= maxGreen &&
                         color.getBlue() >= minBlue && color.getBlue() <= maxBlue) {

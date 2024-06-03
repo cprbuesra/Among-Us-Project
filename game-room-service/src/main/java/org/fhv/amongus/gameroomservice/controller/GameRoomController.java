@@ -101,4 +101,22 @@ public class GameRoomController {
         gameRoomService.eliminatePlayer(gameRoomId, votedPlayerId);
         return ResponseEntity.ok("Vote result handled");
     }
+
+    @GetMapping("/getAllOtherPlayersByRoom")
+    public List<Player> getAllOtherPlayersByRoom(@RequestParam Long playerId, @RequestParam String roomId) {
+        logger.info("Getting all other players in room: {} for player: {}", roomId, playerId);
+        Long roomIdLong = Long.parseLong(roomId);
+        List<Player> players = gameRoomService.getAllOtherPlayersByRoom(playerId, roomIdLong);
+        logger.info("Here are the players: {}", players);
+        return players;
+    }
+
+    @GetMapping("/getCurrentPlayers/{roomId}")
+    public List<PlayerJoinDTO> getCurrentPlayers(@PathVariable String roomId) {
+        Long roomIdLong = Long.parseLong(roomId);
+        logger.info("Getting current players in room: {}", roomId);
+        List<PlayerJoinDTO> players = gameRoomService.getCurrentPlayers(roomIdLong);
+        logger.info("Here are the current players: {}", players);
+        return players;
+    }
 }

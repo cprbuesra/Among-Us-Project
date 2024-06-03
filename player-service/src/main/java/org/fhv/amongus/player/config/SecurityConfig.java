@@ -40,6 +40,8 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers(new MovementServiceRequestMatcher())
                                 .permitAll()
+                                .requestMatchers(new GameRoomServiceRequestMatcher())
+                                .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
@@ -53,6 +55,19 @@ public class SecurityConfig {
     }
 
     public static class MovementServiceRequestMatcher implements RequestMatcher {
+        @Override
+        public boolean matches(HttpServletRequest request) {
+            String remoteHost = request.getRemoteHost();
+
+            // Log the remote host for debugging purposes
+            System.out.println("Remote Host: " + remoteHost);
+
+            // Assuming Movement Service is running on localhost (127.0.0.1)
+            return "127.0.0.1".equals(remoteHost) || "localhost".equals(remoteHost);
+        }
+    }
+
+    public static class GameRoomServiceRequestMatcher implements RequestMatcher {
         @Override
         public boolean matches(HttpServletRequest request) {
             String remoteHost = request.getRemoteHost();

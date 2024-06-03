@@ -2,6 +2,7 @@ package org.fhv.amongus.player.player.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.fhv.amongus.player.player.DTO.PlayerJoinDTO;
 import org.fhv.amongus.player.player.model.Player;
 import org.fhv.amongus.player.player.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,6 @@ public class PlayerRepositoryService {
 
     private final PlayerRepository playerRepository;
 
-
-    public boolean existsByUsername(String username) {
-        return playerRepository.findByUsername(username).isPresent();
-    }
-
     public Optional<Player> findByUsername(String username) {
         return playerRepository.findByUsername(username);
     }
@@ -32,14 +28,18 @@ public class PlayerRepositoryService {
         playerRepository.delete(player);
     }
 
-    public List<Player> findAllOtherPlayers(Long playerId) {
-        return playerRepository.findAllOtherPlayers(playerId);
-    }
-
     public void updatePlayerStatus(Long playerId, String status) {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new IllegalArgumentException("Player not found"));
         player.setStatus(status);
         playerRepository.save(player);
+    }
+
+    public List<PlayerJoinDTO> getAllPlayers(List<Long> playerIDs) {
+        List<Player> playersByRoom = playerRepository.findAllById(playerIDs);
+
+        return playersByRoom.stream()
+                .map(player -> new PlayerJoinDTO(player.getPlayerId().toString(), player.getUsername(), player.getX(), player.getY(), player.isFlip(), player.getRole(), player.getStatus()))
+                .toList();
     }
 }

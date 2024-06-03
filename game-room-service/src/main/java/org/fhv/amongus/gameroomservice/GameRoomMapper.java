@@ -4,7 +4,6 @@ import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.DTO.PlayerDTO;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
 import org.fhv.amongus.gameroomservice.model.Player;
-import org.fhv.amongus.gameroomservice.model.PlayerInfo;
 
 import java.util.List;
 import java.util.stream.Collectors;

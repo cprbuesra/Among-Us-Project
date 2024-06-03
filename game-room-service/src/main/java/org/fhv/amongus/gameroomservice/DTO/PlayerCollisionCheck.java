@@ -1,4 +1,4 @@
-package org.fhv.amongus.movementservice.DTO;
+package org.fhv.amongus.gameroomservice.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlayerEndMove {
-    private String username;
+public class PlayerCollisionCheck {
+    private Long playerId;
     private String roomId;
-    private String playerId;
 }

@@ -20,7 +20,7 @@ public class GameRoom {
     private Long id;
     private String name;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "game_room_players", joinColumns = @JoinColumn(name = "game_room_id"))
     private List<Player> players = new ArrayList<>();
 
