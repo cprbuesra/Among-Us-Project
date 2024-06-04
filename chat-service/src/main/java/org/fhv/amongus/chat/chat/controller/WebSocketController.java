@@ -37,5 +37,11 @@ public class WebSocketController {
         return "Emergency Meeting!";
     }
 
+    @MessageMapping("/emergencyMeetingEnd/{roomId}")
+    @SendTo("/topic/emergencyMeetingEnd/{roomId}")
+    public String emergencyMeetingEnd(@DestinationVariable String roomId) {
+        logger.info("Emergency Meeting ended in room {}", roomId);
+        return "Emergency Meeting ended!";
+    }
 
 }

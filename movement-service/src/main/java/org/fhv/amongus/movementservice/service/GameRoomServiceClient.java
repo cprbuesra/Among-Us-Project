@@ -19,7 +19,7 @@ import java.util.List;
 public class GameRoomServiceClient {
 
     private final RestTemplate restTemplate;
-    private static final Logger logger = LoggerFactory.getLogger(PlayerServiceClient.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public List<Player> findAllOtherPlayers(Long playerId, String roomId) {
         String url = "http://localhost:8081/api/gameRooms/getAllOtherPlayersByRoom";

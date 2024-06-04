@@ -15,20 +15,27 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BoundaryService {
 
-    private List<List<Integer>> mapBounds;
+    private List<List<Integer>> mapBoundsPlayerAlive;
+    private List<List<Integer>> mapBoundsGhostMode;
     private final ResourceLoader resourceLoader;
 
     @PostConstruct
     public void init() throws IOException {
-        //Resource resource = resourceLoader.getResource("classpath:mapBoundsGhostMode.json");
-        Resource resource = resourceLoader.getResource("classpath:mapBounds.json");
+        Resource resourceGhost = resourceLoader.getResource("classpath:mapBoundsGhostMode.json");
+        Resource resourceAlive = resourceLoader.getResource("classpath:mapBounds.json");
         ObjectMapper objectMapper = new ObjectMapper();
-        mapBounds = objectMapper.readValue(resource.getInputStream(), new TypeReference<>() {
+        mapBoundsPlayerAlive = objectMapper.readValue(resourceAlive.getInputStream(), new TypeReference<>() {
+        });
+        mapBoundsGhostMode = objectMapper.readValue(resourceGhost.getInputStream(), new TypeReference<>() {
         });
     }
 
-    public boolean isWithinMovementBoundaries(int x, int y) {
-        return y >= 0 && y < mapBounds.size() && !mapBounds.get(y).contains(x);
+    public boolean isWithinMovementBoundaries(int x, int y, String status) {
+        if (status.equals("ALIVE")) {
+            return y >= 0 && y < mapBoundsPlayerAlive.size() && !mapBoundsPlayerAlive.get(y).contains(x);
+        } else {
+            return y >= 0 && y < mapBoundsGhostMode.size() && !mapBoundsGhostMode.get(y).contains(x);
+        }
     }
 }
 

@@ -51,20 +51,21 @@ public class MovementService {
         int absoluteY = newY + SHIP_HEIGHT / 2 - 20;
         PlayerPosition playerPosition = new PlayerPosition();
 
-        if (boundaryService.isWithinMovementBoundaries(absoluteX, absoluteY)) {
+        if (boundaryService.isWithinMovementBoundaries(absoluteX, absoluteY, move.getStatus())) {
             Player player = playerServiceClient.findPlayerById(move.getPlayerId());
             List<Player> otherPlayers = gameRoomServiceClient.findAllOtherPlayers(move.getPlayerId(), move.getRoomId());
 
             for (Player otherPlayer : otherPlayers){
-                logger.info("The player which was send {}" , otherPlayer );
+                logger.info("The player which is being checked for a collision {}" , otherPlayer );
 
                  if (playerServiceClient.wouldCollideWith(player.getPlayerId(), otherPlayer.getPlayerId())) {
-                    logger.info("Player would collide with another player");
+                    logger.info("Player {} would collide with player {} who is {}", player.getPlayerId(), otherPlayer.getPlayerId(), otherPlayer.getStatus());
                     String targetPlayerId = otherPlayer.getPlayerId().toString();
                     playerPosition.setWouldCollide(true);
                     playerPosition.setTargetPlayerId(targetPlayerId);
+                    playerPosition.setStatus(otherPlayer.getStatus());
                 } else {
-                    playerPosition.setWouldCollide(false);
+                     logger.info("Player {} with coordinates {} {} would not collide with player {} with coordinates {} {}", player.getPlayerId(), player.getX(), player.getY(), otherPlayer.getPlayerId(), otherPlayer.getX(), otherPlayer.getX());
                 }
             }
 

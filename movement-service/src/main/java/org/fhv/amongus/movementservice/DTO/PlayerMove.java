@@ -18,4 +18,5 @@ public class PlayerMove {
     private String sessionId;
     private String token;
     private String username;
+    private String status;
 }

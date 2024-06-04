@@ -1,10 +1,7 @@
 package org.fhv.amongus.movementservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.fhv.amongus.movementservice.DTO.PlayerEndMove;
-import org.fhv.amongus.movementservice.DTO.PlayerMove;
-import org.fhv.amongus.movementservice.DTO.PlayerPosition;
-import org.fhv.amongus.movementservice.DTO.PlayerPositionUpdateRequest;
+import org.fhv.amongus.movementservice.DTO.*;
 import org.fhv.amongus.movementservice.service.MovementMessageSender;
 import org.fhv.amongus.movementservice.service.MovementService;
 import org.slf4j.Logger;
@@ -53,6 +50,17 @@ public class WebSocketController {
         logger.info("Player ID: {}", playerId);
 
         simpMessagingTemplate.convertAndSend("/topic/moveEnd/" + roomId, "{\"playerId\": \"" + playerId + "\"}");
+    }
+
+
+    @MessageMapping("/eliminatePlayer")
+    public void eliminatePlayer(@Payload KillPlayer request) throws Exception {
+
+        String roomId = request.getRoomId();
+        String targetPlayerId = request.getTargetPlayerId();
+
+        logger.info("Player {} has been eliminated in room {}", targetPlayerId, roomId);
+        simpMessagingTemplate.convertAndSend("/topic/eliminatePlayer/" + roomId, "{\"playerId\": \"" + targetPlayerId + "\"}");
     }
 
 

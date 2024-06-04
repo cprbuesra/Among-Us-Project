@@ -44,7 +44,7 @@ public class PlayerController {
         Player targetPlayer = playerService.getPlayerById(collisionRequest.getOtherPlayerId());
 
         boolean wouldCollide = playerService.wouldCollideWith(player, targetPlayer);
-        System.out.println(wouldCollide);
+        logger.info("Would collide: {}", wouldCollide);
 
         return ResponseEntity.ok(wouldCollide);
     }

@@ -31,23 +31,6 @@ public class PlayerServiceClient {
         return player;
     }
 
-        /*String url = String.format("http://localhost:8084/api/player/status, request);
-        logger.info("Requesting URL: {}", url);
-
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        ResponseEntity<List<Player>> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                new ParameterizedTypeReference<List<Player>>() {}
-        );
-
-        List<Player> players = response.getBody();
-        logger.info("Other players data: {}", players);
-        return players;*/
-
 
     public boolean wouldCollideWith(Long playerId, Long otherPlayerId) {
         String url = String.format("%s/api/player/wouldCollideWith", playerServiceUrl);
@@ -62,6 +45,7 @@ public class PlayerServiceClient {
                 entity,
                 Boolean.class
         );
+
         Boolean wouldCollide = response.getBody();
         logger.info("Would collide: {}", wouldCollide);
         return wouldCollide;

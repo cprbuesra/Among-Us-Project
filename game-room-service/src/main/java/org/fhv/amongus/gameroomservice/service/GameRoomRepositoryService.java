@@ -142,4 +142,8 @@ public class GameRoomRepositoryService {
 
         return currentPlayers;
     }
+
+    public List<Player> getAllDeadPlayersByRoomId(Long roomIdLong) {
+        return gameRoomRepository.getAllDeadPlayersByRoom(roomIdLong);
+    }
 }

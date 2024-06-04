@@ -15,5 +15,6 @@ public class PlayerPosition {
     private String sessionId;
     private boolean wouldCollide;
     private String targetPlayerId;
+    private String status;
     private String username;
 }

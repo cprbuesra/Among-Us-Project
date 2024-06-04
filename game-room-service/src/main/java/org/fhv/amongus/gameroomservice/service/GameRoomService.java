@@ -111,4 +111,8 @@ public class GameRoomService {
     public List<PlayerJoinDTO> getCurrentPlayers(Long roomId) {
         return gameRoomRepositoryService.getCurrentPlayers(roomId);
     }
+
+    public List<Player> getAllDeadPlayersByRoomId(Long roomIdLong) {
+        return gameRoomRepositoryService.getAllDeadPlayersByRoomId(roomIdLong);
+    }
 }

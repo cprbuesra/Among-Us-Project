@@ -119,4 +119,13 @@ public class GameRoomController {
         logger.info("Here are the current players: {}", players);
         return players;
     }
+
+    @GetMapping("/getDeadPlayersByRoomId/{roomId}")
+    public List<Player> getDeadPlayersByRoomId(@PathVariable String roomId) {
+        Long roomIdLong = Long.parseLong(roomId);
+        logger.info("Getting dead players in room: {}", roomId);
+        List<Player> players = gameRoomService.getAllDeadPlayersByRoomId(roomIdLong);
+        logger.info("Here are the dead players: {}", players);
+        return players;
+    }
 }
