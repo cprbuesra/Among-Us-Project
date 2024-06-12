@@ -25,7 +25,7 @@ public class Player implements UserDetails {
     private int y;
     private boolean flip;
     private Role role;
-    private String status = "ALIVE";
+    private String status;
 
 
 

@@ -18,6 +18,7 @@ public class VoteSession {
     @GeneratedValue
     private Long id;
     private String gameRoom;
+    private boolean active;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "vote_mapping", joinColumns = @JoinColumn(name = "vote_session_id"))

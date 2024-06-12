@@ -109,6 +109,7 @@ public class PlayerService {
             playerInfo.setPlayerId(currentPlayer.getPlayerId());
             playerInfo.setUsername(currentPlayer.getUsername());
             playerInfo.setRole(String.valueOf(currentPlayer.getRole()));
+            playerInfo.setStatus(currentPlayer.getStatus());
 
             playerInfos.add(playerInfo);
         }

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,20 +19,34 @@ import java.util.stream.Collectors;
 public class VotingService {
 
     private final VotingRepository votingRepository;
+    private final GameRoomServiceClient gameRoomServiceClient;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-
     public void initiateVote(String gameRoom) {
+        // Close any existing active voting sessions for this game room
+        VoteSession activeSession = votingRepository.findByGameRoomAndActive(gameRoom, true);
+        if (activeSession != null) {
+            activeSession.setActive(false);
+            votingRepository.save(activeSession);
+        }
+
+        // Start a new voting session
         VoteSession voteSession = new VoteSession();
         voteSession.setGameRoom(gameRoom);
-        logger.info("Vote initiated for game room {}", gameRoom);
+        voteSession.setActive(true);  // Mark this session as active
+        logger.info("Voting initiated for game room {} and is {}", gameRoom, voteSession.isActive());
         votingRepository.save(voteSession);
     }
 
     public void castVote(String gameRoom, String voterId, String targetPlayerId, String voterUsername, String targetPlayerUsername, String targetPlayerRole) {
-        VoteSession voteSession = votingRepository.findByGameRoom(gameRoom);
+        VoteSession voteSession = votingRepository.findByGameRoomAndActive(gameRoom, true);
         logger.info("this is the game room: {}", gameRoom);
         logger.info("this is the vote session: {}", voteSession);
+
+        if (voteSession == null) {
+            logger.warn("No active voting session found in game room {}", gameRoom);
+            return;
+        }
 
         if (targetPlayerId == null) {
             voteSession.getVotes().remove(voterId);
@@ -44,10 +57,10 @@ public class VotingService {
             logger.info("{} wants to skip the vote in game room {}", voterUsername, gameRoom);
         } else {
             voteSession.getVotes().put(voterId, targetPlayerId);
-            if (targetPlayerUsername != null && !targetPlayerUsername.isEmpty()) {
+            if (!targetPlayerUsername.isEmpty()) {
                 voteSession.getPlayerUsernames().put(targetPlayerId, targetPlayerUsername);
             }
-            if (targetPlayerRole != null && !targetPlayerRole.isEmpty()) {
+            if (!targetPlayerRole.isEmpty()) {
                 voteSession.getPlayerRoles().put(targetPlayerId, targetPlayerRole);
             }
             logger.info("{} wants to vote out {} who has the role {} in game room {}", voterUsername, targetPlayerUsername, targetPlayerRole, gameRoom);
@@ -55,9 +68,13 @@ public class VotingService {
         votingRepository.save(voteSession);
     }
 
-
     public VoteResult getVoteResults(String gameRoom) {
-        VoteSession voteSession = votingRepository.findByGameRoom(gameRoom);
+        VoteSession voteSession = votingRepository.findByGameRoomAndActive(gameRoom, true);
+        if (voteSession == null) {
+            logger.warn("No active voting session found for game room {}", gameRoom);
+            return new VoteResult();
+        }
+
         Map<String, Long> voteCounts = voteSession.getVotes().values().stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
@@ -70,9 +87,18 @@ public class VotingService {
         VoteResult voteResult = new VoteResult();
         voteResult.setVoteCount(voteCounts);
 
-        if (skipVotes >= totalVotes / 2) {
+        if (totalVotes == 0) {
+            logger.info("No votes cast, voting skipped");
+            voteResult.setStatus("skipped");
+            voteResult.setMostVotedPlayerId("none");
+            voteResult.setMostVotedPlayerUsername("none");
+            voteResult.setMostVotedPlayerRole("none");
+        } else if (skipVotes >= totalVotes / 2) {
             logger.info("Voting skipped, no player was voted out");
             voteResult.setStatus("skipped");
+            voteResult.setMostVotedPlayerId("none");
+            voteResult.setMostVotedPlayerUsername("none");
+            voteResult.setMostVotedPlayerRole("none");
         } else {
             long maxVoteCount = Collections.max(voteCounts.values());
 
@@ -83,6 +109,9 @@ public class VotingService {
             if (playersWithMaxVotes > 1) {
                 logger.info("Tie in votes, no player was voted out");
                 voteResult.setStatus("tie");
+                voteResult.setMostVotedPlayerId("none");
+                voteResult.setMostVotedPlayerUsername("none");
+                voteResult.setMostVotedPlayerRole("none");
             } else {
                 String mostVotedPlayerId = voteCounts.entrySet().stream()
                         .filter(entry -> entry.getValue() == maxVoteCount)
@@ -101,7 +130,16 @@ public class VotingService {
                 voteResult.setMostVotedPlayerRole(mostVotedPlayerRole);
             }
         }
+        votingRepository.save(voteSession);
+        gameRoomServiceClient.checkWinCondition(gameRoom);
         return voteResult;
     }
 
+    public void deactivateVoteSession(String roomId) {
+        VoteSession voteSession = votingRepository.findByGameRoomAndActive(roomId, true);
+        if (voteSession != null) {
+            voteSession.setActive(false);
+            votingRepository.save(voteSession);
+        }
+    }
 }

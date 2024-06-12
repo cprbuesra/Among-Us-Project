@@ -1,14 +1,16 @@
 package org.fhv.amongus.gameroomservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.fhv.amongus.gameroomservice.DTO.GameEndEvent;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.DTO.PlayerJoinDTO;
-import org.fhv.amongus.gameroomservice.GameRoomMapper;
+import org.fhv.amongus.gameroomservice.model.GameRoomMapper;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
 import org.fhv.amongus.gameroomservice.model.Player;
 import org.fhv.amongus.gameroomservice.repository.GameRoomRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,7 @@ public class GameRoomRepositoryService {
 
     private final GameRoomRepository gameRoomRepository;
     private final PlayerServiceClient playerServiceClient;
-    private final MovementServiceClient movementServiceClient;
+    private final ApplicationEventPublisher eventPublisher;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     public List<GameRoomDTO> getGameRooms() {
@@ -101,31 +103,17 @@ public class GameRoomRepositoryService {
                 .orElseThrow(() -> new IllegalArgumentException("Room not found"));
     }
 
-    public GameRoom save(GameRoom gameRoom) {
-        return gameRoomRepository.save(gameRoom);
+    public void save(GameRoom gameRoom) {
+        gameRoomRepository.save(gameRoom);
     }
 
     public String getRole(String username) {
         return gameRoomRepository.getRoleByUsername(username);
     }
 
-    public void eliminatePlayer(Long gameRoomId, Long votedPlayerId) {
-        logger.info("Handling vote result for game room: {} and player: {}", gameRoomId, votedPlayerId);
-
-        GameRoom gameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow();
-        gameRoom.getPlayers().stream()
-                .filter(player -> player.getPlayerId().equals(votedPlayerId))
-                .findFirst()
-                .ifPresent(player -> player.setStatus("DEAD"));
-
-
-        playerServiceClient.updatePlayerStatus(votedPlayerId, "DEAD");
-        movementServiceClient.updatePlayerStatus(votedPlayerId, "DEAD");
-        gameRoomRepository.save(gameRoom);
-    }
 
     public List<Player> getAllOtherPlayersByRoom(Long playerId, Long roomId) {
-        return gameRoomRepository.getAllOtherPlayersByRoom(playerId, roomId);
+        return gameRoomRepository.getAllActivePlayersByRoom(playerId, roomId);
     }
 
     @Transactional
@@ -146,4 +134,87 @@ public class GameRoomRepositoryService {
     public List<Player> getAllDeadPlayersByRoomId(Long roomIdLong) {
         return gameRoomRepository.getAllDeadPlayersByRoom(roomIdLong);
     }
+
+    public void setPlayerToGhost(Long gameRoomId, Long votedPlayerIdLong) {
+        GameRoom gameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow();
+        gameRoom.getPlayers().stream()
+                .filter(player -> player.getPlayerId().equals(votedPlayerIdLong))
+                .findFirst()
+                .ifPresent(player -> player.setStatus("GHOST"));
+
+        playerServiceClient.updatePlayerStatus(votedPlayerIdLong, "GHOST");
+        gameRoomRepository.save(gameRoom);
+    }
+
+    public void updatePlayerStatus(Long playerId, Long roomIdLong, String status) {
+GameRoom gameRoom = gameRoomRepository.findById(roomIdLong).orElseThrow();
+        gameRoom.getPlayers().stream()
+                .filter(player -> player.getPlayerId().equals(playerId))
+                .findFirst()
+                .ifPresent(player -> player.setStatus(status));
+
+        gameRoomRepository.save(gameRoom);
+    }
+
+    public boolean isGameStarted(Long roomId) {
+        GameRoom gameRoom = gameRoomRepository.findById(roomId).orElseThrow();
+        return gameRoom.isStarted();
+    }
+
+    public List<Player> getAllAlivePlayersByRoomId(Long roomIdLong) {
+        return gameRoomRepository.getAllAlivePlayersByRoom(roomIdLong);
+    }
+
+    public void eliminatePlayer(Long gameRoomId, Long votedPlayerId) {
+        logger.info("Player {} is dead in  game room: {}", votedPlayerId, gameRoomId);
+
+        GameRoom gameRoom = gameRoomRepository.findById(gameRoomId).orElseThrow();
+        gameRoom.getPlayers().stream()
+                .filter(player -> player.getPlayerId().equals(votedPlayerId))
+                .findFirst()
+                .ifPresent(player -> player.setStatus("DEAD"));
+
+
+        playerServiceClient.updatePlayerStatus(votedPlayerId, "DEAD");
+        checkWinCondition(gameRoomId);
+        gameRoomRepository.save(gameRoom);
+    }
+
+    public void checkWinCondition(Long roomId) {
+        logger.info("Checking win condition for room: {}", roomId);
+        GameRoom gameRoom = gameRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+
+        List<Player> players = gameRoom.getPlayers();
+
+        // Log all player statuses
+        for (Player player : players) {
+            logger.info("Player ID: {}, Username: {}, Status: {}", player.getPlayerId(), player.getUsername(), player.getStatus());
+        }
+
+        long crewmatesCount = players.stream()
+                .filter(player -> player.getRole().equals("CREWMATE") && player.getStatus().equals("ALIVE"))
+                .count();
+        long impostersCount = players.stream()
+                .filter(player -> player.getRole().equals("IMPOSTER") && player.getStatus().equals("ALIVE"))
+                .count();
+
+        logger.info("Crewmates: {}, Imposters: {}", crewmatesCount, impostersCount);
+
+        if (impostersCount == 0) {
+            endGame(gameRoom, "CREWMATES");
+        } else if (impostersCount >= crewmatesCount) {
+            endGame(gameRoom, "IMPOSTERS");
+        }
+    }
+
+
+    private void endGame(GameRoom gameRoom, String winner) {
+        gameRoom.setWinner(winner);
+        gameRoom.setGameState("ENDED");
+        gameRoomRepository.save(gameRoom);
+        eventPublisher.publishEvent(new GameEndEvent(gameRoom.getId().toString(), winner));
+    }
+
+
 }

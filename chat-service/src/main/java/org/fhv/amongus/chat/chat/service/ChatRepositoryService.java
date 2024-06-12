@@ -22,7 +22,7 @@ public class ChatRepositoryService {
 
 
     public List<ChatMessageDTO> getChatHistory(Long roomId) {
-          List<ChatMessage> chatMessages = chatRepository.findAllByRoomId(roomId);
-            return ChatMessageMapper.toDTOList(chatMessages);
+        List<ChatMessage> chatMessages = chatRepository.findAllByRoomId(roomId);
+        return ChatMessageMapper.toDTOList(chatMessages);
     }
 }

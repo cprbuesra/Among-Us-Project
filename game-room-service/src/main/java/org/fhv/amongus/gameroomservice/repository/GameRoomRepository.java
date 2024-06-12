@@ -14,9 +14,14 @@ public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
     @Query("SELECT p.role FROM GameRoom g JOIN g.players p WHERE p.username = :username")
     String getRoleByUsername(@Param("username") String username);
 
-    @Query("SELECT p FROM GameRoom g JOIN g.players p WHERE g.id = :roomId AND p.playerId <> :playerId")
-    List<Player> getAllOtherPlayersByRoom(@Param("playerId") Long playerId, @Param("roomId") Long roomId);
+    @Query("SELECT p FROM GameRoom g JOIN g.players p WHERE g.id = :roomId AND p.playerId <> :playerId AND p.status <> 'GHOST'")
+    List<Player> getAllActivePlayersByRoom(@Param("playerId") Long playerId, @Param("roomId") Long roomId);
+
 
     @Query("SELECT p FROM GameRoom g JOIN g.players p WHERE g.id = :roomId AND p.status = 'DEAD'")
     List<Player> getAllDeadPlayersByRoom(@Param("roomId") Long roomId);
+
+    @Query("SELECT p FROM GameRoom g JOIN g.players p WHERE g.id = :roomId AND p.status = 'ALIVE'")
+    List<Player> getAllAlivePlayersByRoom(Long roomId);
+
 }

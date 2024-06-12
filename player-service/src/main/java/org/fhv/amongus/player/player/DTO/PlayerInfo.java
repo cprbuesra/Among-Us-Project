@@ -12,4 +12,5 @@ public class PlayerInfo {
     private Long playerId;
     private String username;
     private String role;
+    private String status;
 }

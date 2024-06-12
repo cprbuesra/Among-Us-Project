@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.DTO.PlayerJoinDTO;
+import org.fhv.amongus.gameroomservice.controller.WebSocketController;
 import org.fhv.amongus.gameroomservice.model.GameRoom;
 import org.fhv.amongus.gameroomservice.model.Player;
 import org.slf4j.Logger;
@@ -23,7 +24,6 @@ import java.util.List;
 public class GameRoomService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final GameRoomRepositoryService gameRoomRepositoryService;
 
     public List<GameRoomDTO> getGameRooms() {
@@ -114,5 +114,25 @@ public class GameRoomService {
 
     public List<Player> getAllDeadPlayersByRoomId(Long roomIdLong) {
         return gameRoomRepositoryService.getAllDeadPlayersByRoomId(roomIdLong);
+    }
+
+    public void setPlayerToGhost(Long gameRoomId, Long votedPlayerIdLong) {
+        gameRoomRepositoryService.setPlayerToGhost(gameRoomId, votedPlayerIdLong);
+    }
+
+    public void updatePlayerStatus(Long playerId, Long roomIdLong, String status) {
+        gameRoomRepositoryService.updatePlayerStatus(playerId, roomIdLong, status);
+    }
+
+    public boolean isGameStarted(Long roomId) {
+        return gameRoomRepositoryService.isGameStarted(roomId);
+    }
+
+    public List<Player> getAllAlivePlayersByRoomId(Long roomIdLong) {
+        return gameRoomRepositoryService.getAllAlivePlayersByRoomId(roomIdLong);
+    }
+
+    public void checkWinCondition(Long roomIdLong) {
+        gameRoomRepositoryService.checkWinCondition(roomIdLong);
     }
 }

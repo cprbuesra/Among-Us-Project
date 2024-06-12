@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.fhv.amongus.chat.chat.model.ChatMessage;
 import org.fhv.amongus.chat.chat.model.ChatMessageDTO;
 import org.fhv.amongus.chat.chat.service.ChatService;
+import org.fhv.amongus.chat.votingSystem.service.VotingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Controller;
 public class WebSocketController {
 
     private final ChatService chatService;
+    private final VotingService votingService;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 
@@ -32,15 +35,18 @@ public class WebSocketController {
 
     @MessageMapping("/emergencyMeeting/{roomId}")
     @SendTo("/topic/emergencyMeeting/{roomId}")
-    public String emergencyMeeting(@DestinationVariable String roomId) {
+    public ResponseEntity<String> emergencyMeeting(@DestinationVariable String roomId) {
         logger.info("Emergency Meeting in room {}", roomId);
-        return "Emergency Meeting!";
+        votingService.initiateVote(roomId);
+        logger.info("Voting initiated for game room {}", roomId);
+        return ResponseEntity.ok("Emergency Meeting and Voting initiated");
     }
 
     @MessageMapping("/emergencyMeetingEnd/{roomId}")
     @SendTo("/topic/emergencyMeetingEnd/{roomId}")
     public String emergencyMeetingEnd(@DestinationVariable String roomId) {
         logger.info("Emergency Meeting ended in room {}", roomId);
+        votingService.deactivateVoteSession(roomId);
         return "Emergency Meeting ended!";
     }
 

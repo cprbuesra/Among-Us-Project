@@ -1,9 +1,7 @@
-package org.fhv.amongus.gameroomservice;
+package org.fhv.amongus.gameroomservice.model;
 
 import org.fhv.amongus.gameroomservice.DTO.GameRoomDTO;
 import org.fhv.amongus.gameroomservice.DTO.PlayerDTO;
-import org.fhv.amongus.gameroomservice.model.GameRoom;
-import org.fhv.amongus.gameroomservice.model.Player;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -14,7 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -91,15 +94,49 @@ public class GameRoomController {
         return ResponseEntity.ok(assignRolesDTO);
     }
 
-    @PostMapping("/eliminatePlayer")
+    @PostMapping("/killPlayer")
+    public ResponseEntity<String> killPlayer (@RequestBody VoteResultRequest request) {
+        Long gameRoomId = Long.parseLong(request.getGameRoomId());
+        Long votedPlayerIdLong = Long.parseLong(request.getVotedPlayerId());
+
+        gameRoomService.eliminatePlayer(gameRoomId, votedPlayerIdLong);
+        return ResponseEntity.ok("Vote result handled");
+    }
+
+    /*@PostMapping("/eliminatePlayer")
     public ResponseEntity<String> eliminatePlayer(@RequestBody VoteResultRequest request) {
-        logger.info("This is the request: {}", request);
+       logger.info("This is the request: {}", request);
+        String votedPlayerId = request.getVotedPlayerId();
+        if (votedPlayerId == null || votedPlayerId.equals("skip")) {
+            return ResponseEntity.ok("Vote skipped");
+        } else {
+            logger.warn("Voted player ID is null or doesn't match the expected value");
+        }
 
         Long gameRoomId = Long.parseLong(request.getGameRoomId());
-        Long votedPlayerId = Long.parseLong(request.getVotedPlayerId());
+        Long votedPlayerIdLong = Long.parseLong(request.getVotedPlayerId());
 
-        gameRoomService.eliminatePlayer(gameRoomId, votedPlayerId);
+        gameRoomService.eliminatePlayer(gameRoomId, votedPlayerIdLong);
         return ResponseEntity.ok("Vote result handled");
+    }*/
+
+
+
+    @PostMapping("/setPlayerToGhost")
+    public ResponseEntity<String> setToGhost(@RequestBody VoteResultRequest request) {
+        logger.info("This is the request: {}", request);
+        String votedPlayerId = request.getVotedPlayerId();
+        if (votedPlayerId == null) {
+            return ResponseEntity.ok("No Player needs to be set Ghost");
+        } else {
+            Long gameRoomId = Long.parseLong(request.getGameRoomId());
+            Long votedPlayerIdLong = Long.parseLong(request.getVotedPlayerId());
+
+            gameRoomService.setPlayerToGhost(gameRoomId, votedPlayerIdLong);
+            return ResponseEntity.ok("Player set to Ghost!");
+        }
+
+
     }
 
     @GetMapping("/getAllOtherPlayersByRoom")
@@ -128,4 +165,33 @@ public class GameRoomController {
         logger.info("Here are the dead players: {}", players);
         return players;
     }
+
+    @PutMapping("/updatePlayerStatus")
+    public void updatePlayerStatus(@RequestParam Long playerId, @RequestParam Long roomId, @RequestParam String status) {
+        logger.info("Updating player status to: {} for player: {} in room: {}", status, playerId, roomId);
+
+        gameRoomService.updatePlayerStatus(playerId, roomId, status);
+    }
+
+    @GetMapping("/getAlivePlayersByRoomId/{roomId}")
+    public List<Player> getAlivePlayersByRoomId(@PathVariable String roomId) {
+        Long roomIdLong = Long.parseLong(roomId);
+        logger.info("Getting alive players in room: {}", roomId);
+        List<Player> players = gameRoomService.getAllAlivePlayersByRoomId(roomIdLong);
+
+        Set<Player> uniquePlayers = new HashSet<>(players);
+        List<Player> uniquePlayersList = new ArrayList<>(uniquePlayers);
+
+        logger.info("Here are the unique alive players: {}", players);
+        return uniquePlayersList;
+    }
+
+    @PostMapping("/checkWinCondition/{roomId}")
+    public void checkWinCondition(@PathVariable String roomId) {
+        Long roomIdLong = Long.parseLong(roomId);
+        logger.info("Checking win condition for room: {}", roomId);
+        gameRoomService.checkWinCondition(roomIdLong);
+    }
+
+
 }

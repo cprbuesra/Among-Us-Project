@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +25,13 @@ public class GameRoom {
 
     private boolean started = false;
     private String createdBy;
+    private String gameState;
+    private String winner;
 
     public GameRoom(String name, String sessionId) {
         this.name = name;
         this.createdBy = sessionId;
+        this.gameState = "ACTIVE";
+        this.winner = null;
     }
 }

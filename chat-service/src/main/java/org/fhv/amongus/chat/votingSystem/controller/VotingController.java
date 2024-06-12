@@ -22,7 +22,7 @@ public class VotingController {
     @PostMapping("/initiateVoting/{gameRoom}")
     public ResponseEntity<String> initiateVote( @PathVariable String gameRoom) {
         votingService.initiateVote(gameRoom);
-        logger.info("Vote initiated");
+        logger.info("Voting initiated for game room {}", gameRoom);
         return ResponseEntity.ok("Vote initiated");
     }
 
@@ -33,9 +33,15 @@ public class VotingController {
     }
 
 
-    @GetMapping("/results/{gameRoom}")
-    public ResponseEntity<VoteResult> getVoteResults(@PathVariable String gameRoom) {
-        VoteResult result = votingService.getVoteResults(gameRoom);
+    @GetMapping("/results/{roomId}")
+    public ResponseEntity<VoteResult> getVoteResults(@PathVariable String roomId) {
+        logger.info("Getting vote results for game room {}", roomId);
+        VoteResult result = votingService.getVoteResults(roomId);
+        if (result.getStatus() == null) {
+            logger.warn("No active voting session found for game room {}", roomId);
+            return ResponseEntity.notFound().build();
+        }
+        logger.info("Vote results for game room {}: {}", roomId, result);
         return ResponseEntity.ok(result);
     }
 }

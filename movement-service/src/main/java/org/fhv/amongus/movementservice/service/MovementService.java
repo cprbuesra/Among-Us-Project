@@ -82,4 +82,8 @@ public class MovementService {
         }
         return playerPosition;
     }
+
+    public void updatePlayerStatus(Long playerId,Long roomId, String status) {
+        GameRoomServiceClient.updatePlayerStatus(playerId, roomId, status);
+    }
 }

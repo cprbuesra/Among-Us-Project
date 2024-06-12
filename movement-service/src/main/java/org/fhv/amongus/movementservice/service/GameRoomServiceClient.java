@@ -21,6 +21,25 @@ public class GameRoomServiceClient {
     private final RestTemplate restTemplate;
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    public static void updatePlayerStatus(Long playerId, Long roomId, String status) {
+        String url = "http://localhost:8081/api/gameRooms/updatePlayerStatus";
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("playerId", playerId)
+                .queryParam("roomId", roomId)
+                .queryParam("status", status)
+                .build()
+                .toUri();
+
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(
+                uri,
+                HttpMethod.PUT,
+                null,
+                new ParameterizedTypeReference<Void>() {}
+        );
+    }
+
     public List<Player> findAllOtherPlayers(Long playerId, String roomId) {
         String url = "http://localhost:8081/api/gameRooms/getAllOtherPlayersByRoom";
 

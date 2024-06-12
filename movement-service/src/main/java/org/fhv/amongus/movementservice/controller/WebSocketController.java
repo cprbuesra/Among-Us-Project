@@ -56,11 +56,11 @@ public class WebSocketController {
     @MessageMapping("/eliminatePlayer")
     public void eliminatePlayer(@Payload KillPlayer request) throws Exception {
 
-        String roomId = request.getRoomId();
-        String targetPlayerId = request.getTargetPlayerId();
+        Long roomId = Long.parseLong(request.getRoomId());
+        Long targetPlayerId = Long.parseLong(request.getTargetPlayerId());
 
-        logger.info("Player {} has been eliminated in room {}", targetPlayerId, roomId);
-        simpMessagingTemplate.convertAndSend("/topic/eliminatePlayer/" + roomId, "{\"playerId\": \"" + targetPlayerId + "\"}");
+        logger.info("Player {} has been killed in room {}", targetPlayerId, roomId);
+        simpMessagingTemplate.convertAndSend("/topic/eliminatePlayer/" + request.getRoomId(), "{\"playerId\": \"" + request.getTargetPlayerId() + "\"}");
     }
 
 

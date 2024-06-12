@@ -12,6 +12,5 @@ public class ChatMessageDTO {
     private Long id;
     private String content;
     private String sender;
-    private ChatMessage.MessageType type;
     private Long roomId;
 }

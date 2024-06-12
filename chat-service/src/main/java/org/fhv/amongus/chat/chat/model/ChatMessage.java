@@ -1,5 +1,6 @@
 package org.fhv.amongus.chat.chat.model;
 
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -14,20 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 public class ChatMessage {
-
     @Id
     @GeneratedValue
     private Long id;
     private String content;
     private String sender;
-    private MessageType type;
     private Long roomId;
-
-    public enum MessageType {
-        CHAT,
-        JOIN,
-        LEAVE
-    }
-
-
 }

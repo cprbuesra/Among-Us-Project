@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface VotingRepository extends JpaRepository<VoteSession, Long>{
 
-    VoteSession findByGameRoom(String gamaRoom);
+    VoteSession findByGameRoomAndActive(String gameRoom, boolean active);
 }

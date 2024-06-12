@@ -14,7 +14,6 @@ public class ChatMessageMapper {
                 chatMessage.getId(),
                 chatMessage.getContent(),
                 chatMessage.getSender(),
-                chatMessage.getType(),
                 chatMessage.getRoomId()
         );
     }
@@ -28,7 +27,6 @@ public class ChatMessageMapper {
                 chatMessageDTO.getId(),
                 chatMessageDTO.getContent(),
                 chatMessageDTO.getSender(),
-                chatMessageDTO.getType(),
                 chatMessageDTO.getRoomId()
         );
     }
